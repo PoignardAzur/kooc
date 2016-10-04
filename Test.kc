@@ -1,0 +1,19 @@
+@import "Test.kh"
+
+@implementation Test
+{
+	int f(int a)
+	{
+		return (a++);
+	}
+
+	char f(char a)
+	{
+		return (a++);
+	}
+
+	void f(int a, char b)
+	{
+		printf("Test %d %c\n", a, b);
+	}
+}

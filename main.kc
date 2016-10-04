@@ -1,0 +1,12 @@
+@import "Test.kh"
+
+int	main(int ac, char **av)
+{
+	@!(int)[Test.a] = 10;
+
+	@!(char)[Test.a] = [Test f :Test.a];
+
+	[Test f :Test.a, Test.a];
+
+	return ([Test f :Test.a]);
+}
