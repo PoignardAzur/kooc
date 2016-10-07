@@ -52,23 +52,6 @@ Elle a deux effets: faire savoir au KOOC que les modules importés existent et s
 [NOTE chercher récursivement dans sous dossiers?]
 
 
-Opérateur '[]'
---------------
-
-Syntaxes:
-`[modulename.varname`
-`@!(type_name)[modulename.varname`
-`[modulename funcname : arg1 : arg2 : ...`
-`@!(type1)[modulename funcname : arg1 : "@!(type2)arg2 : ...` (à vérifier)
-
-Récupère la variable ou exécute la fonction définie dans modulename. Le type de retour peut être inféré par le compilateur ou précisé par l'utilisateur. Un type ambigu est une erreur de compilation.
-
-TODO - Ajouter méthodes
-
-[NOTE: espaces avant/après ':']
-[NOTE: ": arg1 : arg2" ou ": arg1 arg2"]
-
-
 La déclaration class
 --------------------
 
@@ -82,3 +65,21 @@ L'implémentation d'une classe se fait à l'aide du mot-clé implementation, qui
 Syntaxe member:
 `@member declaration`
 `@member { declarations... }`
+
+
+Opérateur '[]'
+--------------
+
+Syntaxes:
+`[modulename.varname]`
+`@!(type_name)[modulename.varname]`
+`[modulename funcname : arg1 : arg2 : ...]`
+`@!(type1)[modulename funcname : arg1 : "@!(type2)arg2 : ...]` (à vérifier)
+`[object funcname : args...]`
+
+Récupère la variable ou exécute la fonction définie dans modulename (modulename peut être une classe). Le type de retour peut être inféré par le compilateur ou précisé par l'utilisateur. Un type ambigu est une erreur de compilation. La dernière syntaxe est valide seulement si il existe une classe `ClassName` telle que `object` est de type `ClassName *`. Elle est équivalente à `[ClassName funcname : object : args...]`.
+
+TODO - Ajouter new/init/delete/alloc
+
+[NOTE: espaces avant/après ':']
+[NOTE: ": arg1 : arg2" ou ": arg1 arg2"]
