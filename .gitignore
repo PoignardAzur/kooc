@@ -2,3 +2,8 @@
 *~
 *\#
 *.o
+
+*.c
+*.h
+!examples/*.c
+!examples/*.h
