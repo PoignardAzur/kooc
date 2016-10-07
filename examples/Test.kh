@@ -3,6 +3,8 @@
 	int a;
 	char a = 42;
 	double a = 3.8;
+	int foobar(){return 0}; //possible ?
+	static int b = 89;
 
 	int f(int);
 	char f(char);
