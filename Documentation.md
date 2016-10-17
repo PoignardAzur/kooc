@@ -18,6 +18,7 @@ L'instruction module
 ---------------------
 
 Syntaxe:
+
 `@module name_of_the_module { declarations... }`
 
 Ce mot clé marque une définition du module name_of_the_module. Cette définition contient une suite de déclarations à la syntaxe KOOC, qui seront ajoutées à l'espace de nom name_of_the_module. Un module ne peut pas être défini plusieurs fois avec le même nom.
@@ -33,6 +34,7 @@ L'instruction implementation
 -----------------------------
 
 Syntaxe:
+
 `@implementation name_of_the_module { declarations... }`
 
 Ce mot clé marque l'implémentation du module name_of_the_module. Il contient une suite de définitions de fonctions; chaque fonction inclue dans le bloc implementation doit avoir un prototype correspondant dans le bloc module. Les déclarations du bloc module qui impliquent une implémentation (ex: "int x = 3;") sont implicitement implémentées dans le fichier .c correspondant au bloc module.
@@ -46,8 +48,11 @@ L'instruction import
 ---------------------
 
 Syntaxe:
+
 `@import "filename.kh"`
+
 `@import modulename`
+
 `@import classname`
 
 Elle a deux effets: faire savoir au KOOC que les modules importés existent et sont appelables, et assurer l'inclusion par le code C compilé du contenu des modules/fichiers, en évitant les problèmes de double inclusion. L'instruction `import foobar` cherche dans tous les fichiers .kh et .kc le module ou la classe foobar. Les instructions `@implementation` et les opérateurs [] ne sont pas valides si ils ne sont pas précédés par une inclusion du module correspondant.
@@ -59,6 +64,7 @@ L'instruction class
 --------------------
 
 Syntaxe:
+
 `@class ClassName { declarations... }`
 
 Cette déclaration est une surcouche de l'instructions module. Il créée un espace de nom ClassName, et les déclarations dans le bloc class sont gérées de la même façon que dans un bloc module. Le bloc de classe accepte également des déclarations `@member`, qui peuvent définir des variables ou des fonctions membres de ClassName. Lors de la compilation, une structure est créée, dont les champs sont les variables membres de la classe, et un typedef de cette structure est fait vers le nom de la classe. Les fonctions membres sont équivalentes à des fonctions de modules, avec un argument supplémentaire de type ClassName*.
@@ -66,7 +72,9 @@ Cette déclaration est une surcouche de l'instructions module. Il créée un esp
 L'implémentation d'une classe se fait à l'aide du mot-clé implementation, qui accepte également des déclarations member.
 
 Syntaxe member:
+
 `@member declaration`
+
 `@member { declarations... }`
 
 
@@ -74,16 +82,24 @@ Opérateur '[]'
 --------------
 
 Syntaxes:
+
 `[modulename.varname]`
+
 `@!(type_name)[modulename.varname]`
+
 `[modulename funcname : arg1 : arg2 : ...]`
+
 `@!(type1)[modulename funcname : arg1 : "@!(type2)arg2 : ...]` (à vérifier)
+
 `[object funcname : args...]`
+
+`[object.varname]`
 
 Récupère la variable ou exécute la fonction définie dans modulename (modulename peut être une classe). Le type de retour peut être inféré par le compilateur ou précisé par l'utilisateur. Un type ambigu est une erreur de compilation.
 
-La dernière syntaxe est valide seulement si il existe une classe `ClassName` telle que `object` est de type `ClassName *`. Elle est équivalente à `[ClassName funcname : object : args...]`.
+Les deux dernières syntaxe est valide seulement si il existe une classe `ClassName` telle que `object` est de type `ClassName *`. Elle est équivalente à `[ClassName funcname : object : args...]`.
 
+[NOTE: qu'est-ce qui se passe si object est une expression?]
 TODO - Ajouter new/init/delete/alloc
 
 [NOTE: espaces avant/après ':']
