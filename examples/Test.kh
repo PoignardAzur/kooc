@@ -10,3 +10,19 @@
 	char f(char);
 	void f(int, char);
 }
+
+@class StackInt
+{
+	@member
+	{
+		int size;
+		int nbitem;
+		void	init(int);
+		void	clean();
+		int	nbitem();
+	}
+	@member int	*data;
+	@member void	push(int);
+	int	pop(StackInt *);
+	int	nbstack = 0;
+}

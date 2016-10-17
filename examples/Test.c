@@ -24,3 +24,30 @@ int _kooc_Test_int_foobar()
 {
   return 0;
 }
+
+void    _kooc_Stackint_int_init_m_Stackint_ptr_int(struct Stackint *self, int size)
+{
+  int     *buf;
+  self->_kooc_nbitem = 0;
+  self->_kooc_size = size;
+  buf = (int *) calloc(size, sizeof(int));
+  self->_kooc_data = buf;
+}
+
+int     _kooc_Stackint_int_nbitem_m_Stackint_ptr(struct Stackint *self)
+{
+  int n;
+  n = self->_kooc_nbitem;
+  return (n);
+}
+
+int     _kooc_Stackint_int_push_m_Stackint_ptr_int(struct Stackint *self, int i)
+{
+  int pos;
+  int *buf;
+
+  pos = self->_kooc_nbitem;
+  buf = self->_kooc_data;
+  buf[pos++] = i;
+  self->_kooc_nbitem = pos;
+}

@@ -1,13 +1,15 @@
-#ifndef TEST_H_
-# define TEST_H_
 # include "Test.h"
-#endif  
 
 int	main(int ac, char **av)
 {
-  Test.a_int = 10;
-  Test.a_char = Test.f_char(Test.a_char);
-  Test.f_void(Test.a_int, Test.a_char);
+  _kooc_Test_int_a = 10;
+  _kooc_Test_char_a = _kooc_Test_char_f_char(_kooc_Test_char_a);
+  _kooc_Test_void_f_int_char(_kooc_Test_int_a, _kooc_Test_char_a);
 
-  return (Test.f_int(Test.a_int));
+  struct Stackint        t;
+  struct Stackint        *tp;
+  void            *t2;
+
+  _kooc_Stackint_int_init_m_Stackint_ptr_int(&t);
+  return  _kooc_Test_int_f_int(_kooc_Test_int_a);
 }

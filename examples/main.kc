@@ -9,4 +9,15 @@ int	main(int ac, char **av)
 	[Test f :Test.a, Test.a];
 
 	return ([Test f :Test.a]);
+	Stackint	t;
+	Stackint	*tp;
+	void		*t2;
+	[Toto init :&t];
+	 tp = &t;
+	 [Toto init :tp];
+	 [tp init];//ok
+	 t2 = tp;
+	 [tp clean];
+	return ([Test f :Test.a]);
+		 
 }
