@@ -1,0 +1,48 @@
+@import "StackInt.kh"
+
+@implementation StackInt
+{
+    @member void    _foobar() {}
+
+    @member
+    {
+        int     getSize()
+        {
+            return [self._size];
+        }
+
+        void	init(int size)
+        {
+    		[self._size] = size;
+    		[self._data] = (int *)calloc(size, sizeof(int));
+            ++[StackInt.nb_stack];
+        }
+
+        void	clean()
+        {
+            free([self._data]);
+            --[StackInt.nb_stack];
+        }
+
+        void    push(int newVal)
+        {
+            ++[self._size];
+            [self._data] = (int *)realloc([self._data], size * sizeof(int));
+            [self._data][[self._size] - 1] = newVal;
+        }
+
+        int	    pop()
+        {
+            int last = [self._data][[self._size] - 1];
+
+            --[self._size];
+            [self._data] = (int *)realloc([self._data], size * sizeof(int));
+            return last;
+        }
+    }
+
+    int             getMax(StackInt *self)
+    {
+        return @!(int)[Algo greatest : @!(int *)[self._data] : @!(int)[self._size]];
+    }
+}

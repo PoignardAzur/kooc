@@ -1,0 +1,24 @@
+@import "Algo.kh"
+
+@class StackInt
+{
+    @member
+    {
+        char    _foobar;
+        int     _foobar;
+        void    _foobar();
+
+        int     _size;
+        int     getSize();
+
+        void	init(int stackSize);
+        void	clean();
+    }
+
+    @member int     *_data;
+    @member void    push(int newVal);
+    int	            pop(StackInt *);
+    int             getMax(StackInt *);
+
+    int	    nb_stack = 0;
+}

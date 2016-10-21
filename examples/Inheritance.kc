@@ -1,0 +1,35 @@
+@import "Inheritance.kh"
+@import "stdio.h"
+
+@implementation Animal
+{
+    @member
+    {
+        void            init(int legs)
+        {
+			[super init];
+            [self._legs] = legs;
+        }
+
+        void            cry()
+        {
+            printf("I have %d legs!\n", [self._legs]);
+        }
+    }
+}
+
+@implementation Cat
+{
+    @member
+    {
+        void            init()
+        {
+            [super init : 4];
+        }
+
+        void            cry()
+        {
+            printf("Meow! I am a cat!\n");
+        }
+    }
+}

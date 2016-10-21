@@ -1,0 +1,17 @@
+@module Algo
+{
+    int     THE_ANSWER = 42;
+    char    THE_ANSWER = 42;
+    double  THE_ANSWER = 4.2;
+
+    int         return_the_answer();
+
+    int         greatest(int *range, int size);
+    long        greatest(int *range, int size);
+    long        greatest(long *range, int size);
+
+    static int  max(int n1, int n2);
+    static long max(long n1, long n2);
+
+    // inline functions?
+}

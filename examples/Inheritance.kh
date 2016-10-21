@@ -1,0 +1,21 @@
+@class Animal
+{
+    @member
+    {
+        int     _legs;
+
+        void            init(int legs);
+        @virtual void   cry();
+    }
+}
+
+@class Cat
+{
+    @member
+    {
+        int     _legs;
+
+        void            init();
+        @virtual void   cry();
+    }
+}
