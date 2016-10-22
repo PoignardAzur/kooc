@@ -1,0 +1,49 @@
+The Declaration class has a parse() method, which will return a Node object. If we call this object 'ast', then ast.body must be a list of either cnorm Decl objects or cnorm Raw objects representing preprocessor directives.
+
+ast.body : List<cnorm.nodes.Raw || cnorm.nodes.Decl>
+
+cnorm.nodes.Raw
+    value           : str
+
+cnorm.nodes.Decl
+    _name           : str
+    _ctype          : cnorm.nodes.CType
+    _assign_expr    : cnorm.nodes.Expr
+    _colon_expr     : cnorm.nodes.Expr
+    body            : cnorm.nodes.BlockStmt
+
+cnorm.nodes.CType
+    _identifier     : str
+    _specifier      : int
+    _sign           : int
+    _storage        : int
+    _decltype       : cnorm.nodes.DeclType
+
+cnorm.nodes.ComposedType    -> cnorm.nodes.CType
+    enums           : List<>
+    >> TODO
+
+cnorm.nodes.Expr
+    >> TODO
+cnorm.nodes.BlockStmt
+    >> TODO
+
+
+cnorm.nodes.DeclType
+
+cnorm.nodes.PointerType     -> cnorm.nodes.DeclType
+    _decltype       : cnorm.nodes.DeclType
+
+cnorm.nodes.ArrayType       -> cnorm.nodes.DeclType
+    _expr           : int
+    _decltype       : cnorm.nodes.DeclType
+
+cnorm.nodes.ParenType       -> cnorm.nodes.DeclType
+    >> TODO
+
+cnorm.nodes.QualType        -> cnorm.nodes.DeclType
+    _qualifier      : int
+    _decltype       : cnorm.nodes.DeclType
+
+cnorm.nodes.AttrType        -> cnorm.nodes.DeclType
+    >> TODO
