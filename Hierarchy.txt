@@ -1,0 +1,32 @@
+The KoocParser class has a parse() method, which will return a Node object. If we call this object 'ast', then ast.body must be a list of either cnorm Decl objects or Kooc declaration objects.
+
+ast.body : List<cnorm.nodes.Decl || KoocDecl>
+KoocDecl = KoocImport || KoocModule || KoocClass || KoocImplem
+
+KoocImport
+    filename    : str
+
+KoocModule
+    name        : str
+    fields      : List<cnorm.nodes.Decl>
+
+KoocClass
+    name        : str
+    fields      : List<cnorm.nodes.Decl>
+    members     : List<cnorm.nodes.Decl>
+
+KoocImplem
+    name        : str
+    fields      : List<cnorm.nodes.Decl>      >> Function implementations only
+
+
+The compiler can also find `[]` operands inside C expressions (ex: x = `[MyModule.foobar]`), which must be parsed into KoocExpr objects. (NOTE: this syntax doesn't take classes into account yet)
+
+KoocExpr
+    moduleName  : str
+    name        : str
+    isFunc      : bool
+    args        : None || List<cnorm.nodes.Expr>
+
+
+The ast.body object must then be converted, with every Kooc declaration in it replaced by C declarations and preprocessor directives (see Hierarchy_CNorm.txt), and every Kooc expression transformed into a C expression.
