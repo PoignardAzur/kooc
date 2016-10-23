@@ -143,11 +143,13 @@ La description d’un variable s’effectura de la manière suivante :
 name_[attribut de type]_{type}
 
 les attributs de types :
-[static/inline/volatile/const]_{koocType/scalarType/ptr/tab$size}
+[static/inline/volatile/const]_{koocType/scalarType/ptr/tab$size/userdef$typename}
 
-ScalarType étant les types natifs (char, int ect..). En cas de type en deux mot (exemple long long) on les séparera par un ‘$’
+ScalarType étant les types natifs (char, int ect..). En cas de type en deux mot (exemple long long) on les séparera par un ‘’
+En cas de présence d’un ‘_’ dans le nom d’un type ou de la variable on mettra ‘S’ devant
 kooType s’écrivant koocType_nom (exemple une classe kooc)
 En cas de pointeurs ou de tableaux on relancera le processus de l’attribut sur le node suivant dans l’arbre.
+Quand le type est un user defined (structure, typedef) on mettra le préfix userdef puis un séparateur $ et le nom du type. En cas de structure on l’écrira dans le nom en le séparant par $
 
 Exemple : 
 
@@ -157,6 +159,7 @@ int a ; → _kooc_var_z_a_int
 static int *a → _kooc_var_z_a_ptr_static_int
 int volatile * static *const *a[4]  →
 _kooc_var_z_a_volatile_ptr_static_ptr_const_ptr_tab-4_int
+struct s_e a ; → _kooc_var_z_a_userdef$struct$sS_e
 }
 
 La description des fonctions s’effectura de la manière suivante :
