@@ -1,5 +1,5 @@
 @import "Inheritance.kh"
-@import "stdio.h"
+#include "stdio.h"
 
 @implementation Animal
 {
@@ -7,7 +7,6 @@
     {
         void            init(int legs)
         {
-			[super init];
             [self._legs] = legs;
         }
 
@@ -24,7 +23,7 @@
     {
         void            init()
         {
-            [super init : 4];
+            [self._legs] = 4;
         }
 
         void            cry()

@@ -9,12 +9,10 @@
     }
 }
 
-@class Cat
+@class Cat(Animal)
 {
     @member
     {
-        int     _legs;
-
         void            init();
         @virtual void   cry();
     }

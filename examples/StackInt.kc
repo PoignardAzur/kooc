@@ -11,10 +11,10 @@
             return [self._size];
         }
 
-        void	init(int size)
+        void	init(int stackSize)
         {
-    		[self._size] = size;
-    		[self._data] = (int *)calloc(size, sizeof(int));
+    		[self._size] = stackSize;
+    		[self._data] = (int *)calloc(stackSize, sizeof(int));
             ++[StackInt.nb_stack];
         }
 
@@ -27,7 +27,7 @@
         void    push(int newVal)
         {
             ++[self._size];
-            [self._data] = (int *)realloc([self._data], size * sizeof(int));
+            [self._data] = (int *)realloc([self._data], [self._size] * sizeof(int));
             [self._data][[self._size] - 1] = newVal;
         }
 
