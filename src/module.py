@@ -1,3 +1,4 @@
+from mangling import *
 import copy
 import sys
 from cnorm.parsing.declaration import Declaration
@@ -12,5 +13,5 @@ class KoocModule(Node) :
     def transform(self) :
         tmp_fields = copy.deepcopy(self.fields)
         for tmp in tmp_fields:
-            tmp._name = self.name + tmp._name
+            tmp._name = mangling(tmp, tmp._name)
         return tmp_fields

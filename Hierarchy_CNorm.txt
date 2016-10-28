@@ -14,7 +14,7 @@ cnorm.nodes.Decl
 
 cnorm.nodes.CType
     _identifier     : str (char, int, float, double)
-    _specifier      : int --> 4: long 5 : long long 6 : short
+    _specifier      : int --> 4: long 5 : long long 6 : short, 0 : rien lol
     _sign           : int --> 2: unsigned, 1 : signed
     _storage        : int --> 1 : register, 3 : static, 5 : inline, 2 : typedef, 4 : extern
     _decltype       : cnorm.nodes.DeclType
