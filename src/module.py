@@ -10,6 +10,5 @@ class KoocModule(Node) :
         self.fields = fields
     def transform() :
         for tmp in fields:
-            tmp._name = self.name + tmp_name
+            tmp._name = self.name + tmp._name
         return fields
-        

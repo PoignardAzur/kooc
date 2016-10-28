@@ -1,0 +1,2 @@
+def mangling(decl, name):
+    
