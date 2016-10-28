@@ -1,3 +1,4 @@
+import copy
 import sys
 from cnorm.parsing.declaration import Declaration
 from cnorm.passes import to_c
@@ -9,7 +10,7 @@ class KoocModule(Node) :
         self.name = name
         self.fields = fields
     def transform(self) :
-        tmp_fields = self.fields
+        tmp_fields = copy.deepcopy(self.fields)
         for tmp in tmp_fields:
             tmp._name = self.name + tmp._name
-        return fields
+        return tmp_fields
