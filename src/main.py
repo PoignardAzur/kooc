@@ -2,10 +2,17 @@
 
 import sys
 from pathlib import Path
+from pyrser.error import Diagnostic
 import KoocParser
 
 def convertAST(node):
-    return None
+    decl_list = []
+    for decl in node.body:
+        if hasattr(decl, "transform"):
+            decl_list.extend(decl.transform())
+        else:
+            decl_list.append(decl)
+    node.body = decl_list
 
 def convert_filename(filename: str):
     end = filename[-3:]
@@ -28,11 +35,11 @@ def parse_file(filename: str):
 
     print(node)
 
-    if False:
+    if True:
         #resolve KOOC calls
-        new_ast = convertAST(node)
+        convertAST(node)
         file = open(convert_filename(filename), "w")
-        file.write(new_ast.to_c())
+        file.write(str(node.to_c()))
 
 def main(argv):
     if len(argv) < 2:
