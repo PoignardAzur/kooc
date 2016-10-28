@@ -8,7 +8,8 @@ class KoocModule(Node) :
     def __init__(self, name, fields):
         self.name = name
         self.fields = fields
-    def transform() :
-        for tmp in fields:
+    def transform(self) :
+        tmp_fields = self.fields
+        for tmp in tmp_fields:
             tmp._name = self.name + tmp._name
         return fields
