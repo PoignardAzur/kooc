@@ -2,6 +2,7 @@ import sys
 from cnorm.parsing.declaration import Declaration
 from cnorm.passes import to_c
 from cnorm.nodes import *
+from pyrser.parsing.node import Node
 
 class KoocModule(Node) :
     def __init__(self, name, fields):
