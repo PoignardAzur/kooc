@@ -1,7 +1,7 @@
 from cnorm.nodes import *
 
 def wichdecl(decl):
-    if type(decl._ctype) is PrimaryType :
+    if type(decl._ctype) is FuncType :
         return "_var"
     else :
         return "_func"
@@ -42,10 +42,15 @@ def mangl_var(decl):
     
 
 def mangl_func(decl):
-    return mangl_var(decl)
+    return mangl_var(decl) + "_" + str(len(decl._ctype._params))
 
 def mangl_userDef(decl):
-    return "_S" + decl._ctype._identifier
+    if hasattr(decl._ctype, "enums"):
+        return "_E" + decl._ctype._identifier
+    if decl._ctype._specifier == 1:
+        return "_S" + decl._ctype._identifier
+    else:
+        return "_U" + decl._ctype._identifier
 
 def typeof_decl(decl):
     if type(decl._ctype) is PrimaryType :
