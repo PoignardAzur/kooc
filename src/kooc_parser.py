@@ -1,14 +1,13 @@
-#!/usr/bin/env python
-
 from pyrser import meta, grammar
 from pyrser.parsing import node
 from pyrser.hooks.set import set_node
 from cnorm.parsing.declaration import Declaration
+from cnorm.passes import to_c
 
-from at_import import AtImport
-from at_module import AtModule
-from at_implem import AtImplementation
-from kooc_call import KoocCall
+from .at_import import AtImport
+from .at_module import AtModule
+from .at_implementation import AtImplementation
+from .kooc_call import KoocCall
 
 class KoocParser(grammar.Grammar, Declaration):
     """Transforms text in KOOC format to a KOOC AST"""
@@ -26,7 +25,11 @@ class KoocParser(grammar.Grammar, Declaration):
         [
             __scope__:decl_ast
 
-            at_module
+            [
+                at_import
+                | at_module
+                | at_implem
+            ]
 
             #add_kooc_decl(current_block, decl_ast)
         ]
@@ -65,9 +68,11 @@ class KoocParser(grammar.Grammar, Declaration):
 
             #create_implem(decl_ast,current_block,module_name)
         ]
-
+/*
         primary_expression =
         [
+            // Creates weird errors; should examine Expression source before
+            // uncommenting
             Expression.primary_expression
             | kooc_call
         ]
@@ -84,6 +89,11 @@ class KoocParser(grammar.Grammar, Declaration):
             ']'
         ]
 
+        kooc_type =
+        [
+            "@!(" Base.id:typename ")"
+        ]
+*/
     """
 
 @meta.hook(KoocParser)

@@ -4,15 +4,16 @@ import sys
 from pathlib import Path
 from pyrser.error import Diagnostic
 
-from koocParser import KoocParser
-from convert_kooc_calls import convert_kooc_calls
+from .kooc_parser import KoocParser
+from .kooc_call import convert_all_kooc_calls
+from .object_list import ObjectList
 
 
-def convert_ast(node):
+def convert_ast(node, object_list: ObjectList):
     decl_list = []
     for decl in node.body:
-        if hasattr(decl, "transform"):
-            decl_list.extend(decl.transform())
+        if hasattr(decl, "get_c_ast"):
+            decl_list.extend(decl.get_c_ast(object_list))
         else:
             decl_list.append(decl)
     node.body = decl_list
@@ -28,31 +29,32 @@ def convert_filename(filename: str):
 
 
 def parse_file(filename: str):
-    if not Path(filename).is_file():
-        sys.stderr.write("Error: " + str(filename) + " does not exist or isn't a file\n")
-        return
     print("Parsing file " + filename)
     try:
         node = KoocParser().parse_file(filename)
-        convert_ast(node)
-        convert_kooc_calls(node)
+        object_list = ObjectList()
+        convert_ast(node, object_list)
+        convert_all_kooc_calls(node.body, object_list)
         file = open(convert_filename(filename), "w")
         file.write(str(node.to_c()))
+        file.close()
     except Diagnostic as diag:
         sys.stderr.write("Parsing error: " + str(diag) + "\n")
-        return
+        return False
+    return True
 
 
-def main(argv):
+def main(argv = []):
     if len(argv) < 2:
-        sys.exit("No input files")
+        sys.stderr.write("No input files\n")
+        return False
     for arg in argv[1:]:
-        try:
-            parse_file(arg)
-        except Exception as e:
-            sys.exit("An exception of type " + str(type(e)) + " was raised: " + str(e.args))
-        except:
-            sys.exit("An unknown exception was raised")
+        if not Path(arg).is_file():
+            sys.stderr.write("Error: " + str(arg) + " does not exist or isn't a file\n")
+            return False
+        elif not parse_file(arg):
+            return False
+    return True
 
 
 if __name__ == "__main__":

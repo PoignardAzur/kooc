@@ -1,0 +1,29 @@
+
+int AAAAA;
+int BBBBB;
+int CCCCC;
+
+@module A
+{
+    int x;
+    int y;
+    int z;
+
+    int x();
+}
+
+@implementation A
+{
+    int x()
+    {
+        return 1;
+    }
+}
+
+int main()
+{
+    int foobar = 1;
+
+    foobar++;
+    return 0;
+}

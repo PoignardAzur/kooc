@@ -1,5 +1,7 @@
 from pyrser.parsing.node import Node
-from mangling import mangling
+
+from .mangling import mangling
+from .object_list import ObjectList
 
 class KoocCall(Node):
 
@@ -10,7 +12,7 @@ class KoocCall(Node):
         self.isFunc = isFunc
         self.args = args
 
-    def get_c_ast(self, module_list: object_list) :
+    def get_c_ast(self, module_list: ObjectList) :
         # TODO
         return []
 

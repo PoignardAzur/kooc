@@ -1,6 +1,8 @@
 import copy
 from pyrser.parsing.node import Node
-from mangling import mangling
+
+from .mangling import mangling
+from .object_list import ObjectList
 
 
 class AtModule(Node):
@@ -9,7 +11,7 @@ class AtModule(Node):
         self.name = name
         self.fields = fields
 
-    def get_c_ast(self, module_list: object_list) :
+    def get_c_ast(self, module_list: ObjectList) :
         module_list.add_module(self)
         c_fields = copy.deepcopy(self.fields)
         for field in c_fields:
