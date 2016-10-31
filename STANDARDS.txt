@@ -1,0 +1,32 @@
+COMMITS ET MESSAGES DE COMMITS
+
+Les messages de commit doivent être écrits en anglais, et obéir à la norme à l'addresse https://github.com/erlang/otp/wiki/writing-good-commit-messages. Lisez-la les gens, elle est super courte. Pour faire encore plus court:
+- Messages un minimum informatifs
+- Si le message fait plus d'une ligne, la seconde ligne est vide
+- Utilisez l'impératif, par le passé composé
+
+Si ne savez pas quoi mettre dans un message de commit, faites un git status, puis un git diff pour chaque fichier que vous avez changé, et faites un résumé de ce que vous voyez.
+
+
+UNIT TESTING
+
+Faites des tests unitaires avant de coder les fonctions testées. La cycle de développement normal est:
+- On ajoute un test à la batterie;
+- On refait tourner la batterie de tests sans changer le code;
+- Si tous les tests réussissent, il y a probablement une erreur dans le test ajouté
+- On modifie le code jusqu'à tous les tests réussissent
+- On push
+Ne pushez pas de code sans avoir fait tourner toute la batterie de tests. Ne pushez jamais de code sur la branche master qui ne passe pas tous les tests.
+
+Pour chaque fichier que vous creez dans src/ créez un fichier dans tests/ sur le modèle de tests/main.py. Ajoutez le test à tests/all_tests.py.
+
+Pour faire tourner la batterie de tests, utilisez la commande 'python3 -m unittest tests/all_tests.py'
+
+
+FORMAT CODE
+
+Le projet devrait idéalement être à la norme PEP 8. Par contre elle est un peu longue. Version courte:
+- L'indentation comme dans Emacs
+- Pas de lignes de plus de 80 colonnes
+- Noms de classes en CamelCase
+- Noms de fichiers, variables et fonctions en snake_case
