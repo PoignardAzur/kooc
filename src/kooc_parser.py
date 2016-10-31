@@ -5,8 +5,10 @@ from pyrser.parsing import node
 from pyrser.hooks.set import set_node
 from cnorm.parsing.declaration import Declaration
 
-import module
-import node_implementation
+from at_import import AtImport
+from at_module import AtModule
+from at_implem import AtImplementation
+from kooc_call import KoocCall
 
 class KoocParser(grammar.Grammar, Declaration):
     """Transforms text in KOOC format to a KOOC AST"""
@@ -27,6 +29,13 @@ class KoocParser(grammar.Grammar, Declaration):
             at_module
 
             #add_kooc_decl(current_block, decl_ast)
+        ]
+
+        at_import =
+        [
+            "@import" str:filename
+
+            #create_import(decl_ast,filename)
         ]
 
         at_module =
@@ -57,6 +66,24 @@ class KoocParser(grammar.Grammar, Declaration):
             #create_implem(decl_ast,current_block,module_name)
         ]
 
+        primary_expression =
+        [
+            Expression.primary_expression
+            | kooc_call
+        ]
+
+        kooc_call =
+        [
+            kooc_type?
+            '['
+            Base.id:module_name
+            [
+                '.' Base.id:var_name
+                | Base.id:func_name [ ':' kooc_type? Expression.expression:expr ]*
+            ]
+            ']'
+        ]
+
     """
 
 @meta.hook(KoocParser)
@@ -65,14 +92,18 @@ def add_kooc_decl(self, current_block, ast):
     return True
 
 @meta.hook(KoocParser)
+def create_import(self, ast, filename):
+    ast.contents = AtImport(self.value(module_name).strip('"'))
+    return True
+
+@meta.hook(KoocParser)
 def create_module(self, ast, contents, module_name):
-    ast.contents = module.KoocModule(self.value(module_name), contents.ref.body)
+    ast.contents = AtModule(self.value(module_name), contents.ref.body)
     return True
 
 @meta.hook(KoocParser)
 def create_implem(self, ast, contents, module_name):
-    ast.contents = node_implementation.KoocImplem(self.value(module_name), contents.ref.body)
+    ast.contents = AtImplementation(self.value(module_name), contents.ref.body)
     return True
 
 defaultKoocParser = KoocParser()
-
