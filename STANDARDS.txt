@@ -18,9 +18,9 @@ Faites des tests unitaires avant de coder les fonctions testées. La cycle de d�
 - On push
 Ne pushez pas de code sans avoir fait tourner toute la batterie de tests. Ne pushez jamais de code sur la branche master qui ne passe pas tous les tests.
 
-Pour chaque fichier que vous creez dans src/ créez un fichier dans tests/ sur le modèle de tests/main.py. Ajoutez le test à tests/all_tests.py.
+Pour chaque fichier que vous creez dans src/ créez un fichier dans tests/ sur le modèle de tests/test_src_main.py. Le fichier doit être au format 'test_*.py'.
 
-Pour faire tourner la batterie de tests, utilisez la commande 'python3 -m unittest tests/all_tests.py'
+Pour faire tourner la batterie de tests, utilisez la commande 'python3 -m unittest discover tests'.
 
 
 FORMAT CODE
