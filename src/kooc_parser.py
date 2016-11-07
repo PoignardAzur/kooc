@@ -36,7 +36,7 @@ class KoocParser(grammar.Grammar, Declaration):
 
         at_import =
         [
-            "@import" str:filename
+            "@import" string:filename
 
             #create_import(decl_ast,filename)
         ]
@@ -103,7 +103,7 @@ def add_kooc_decl(self, current_block, ast):
 
 @meta.hook(KoocParser)
 def create_import(self, ast, filename):
-    ast.contents = AtImport(self.value(module_name).strip('"'))
+    ast.contents = AtImport(self.value(filename).strip('"'))
     return True
 
 @meta.hook(KoocParser)

@@ -11,3 +11,6 @@ class AtImport(Node):
     def get_c_ast(self, module_list: ObjectList) :
         # TODO
         return []
+
+class KoocImportError(Exception):
+    pass
