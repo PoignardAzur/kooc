@@ -4,6 +4,8 @@ from src.at_module import AtModule
 
 import unittest
 
+par = cnorm.parsing.declaration.Declaration()
+
 AtModule("Empty", [])
 
 implem_empty =
@@ -13,7 +15,9 @@ implem_empty =
     }
 """
 
-AtModule("Variable", [])
+AtModule("Variable", [par.parse("int x;"),
+                      par.parse("int y = 3;"),
+                      par.parse("float x;")])
 
 implem_only_variable =
 """
@@ -22,27 +26,54 @@ implem_only_variable =
     }
 """
 
-AtModule("Function", )
+AtModule("Function", [par.parse("int func1(int x);"),
+                      par.parse("int func2();"),
+                      par.parse("void func1(char a, char b, int *c);")])
 
 implem_only_function =
 """
     @implementation Function
     {
-        int     f(int x)
+        int     func1(int x)
         {
             return (-x);
         }
+
+        int     func2()
+        {
+            return (1);
+        }
+
+        void    finc1(char a, char b, int *c)
+        {
+            *c = a * b;
+        }
     }
 """
-AtModule("All", )
+AtModule("All", [par.parse("int x;"),
+                 par.parse("int y = 3;"),
+                 par.parse("float x;"),
+                 par.parse("int func1(int x);"),
+                 par.parse("int func2();"),
+                 par.parse("void func1(char a, char b, int *c);")])
 
 implem_all =
 """
     @implementation All
     {
-        int     f(int x)
+        int     func1(int x)
         {
             return (-x);
+        }
+
+        int     func2()
+        {
+            return (1);
+        }
+
+        void    finc1(char a, char b, int *c)
+        {
+            *c = a * b;
         }
     }
 """
