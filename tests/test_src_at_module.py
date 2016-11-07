@@ -21,9 +21,15 @@ class TestAtModule(unittest.TestCase):
         # test sans nom
         self.assertRaises(Diagnostic, kooc_parser.parse, "@module {}")
         self.assertRaises(Diagnostic, kooc_parser.parse, "@module")
-        self.assertRaises(Diagnostic, kooc_parser.parse, '@module "foobar" {}')
+        self.assertRaises(Diagnostic, kooc_parser.parse, '@module "bar" {}')
 
-
+        # test de base
+        parsed_module = kooc_parser.parse("@module foobar {int x;}")
+        control_module = at_module.AtModule("foobar", par.parse("int x;").body)
+        # obj_list = ObjectList()
+        # to_check = par.parse("int a = 3;").body[0]
+        # to_check._name = mangling(to_check, "foo")
+        self.assertEqual(parsed_module, control_module)
 
 
 
