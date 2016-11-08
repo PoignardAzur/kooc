@@ -21,6 +21,11 @@ class TestAtImport(unittest.TestCase):
             kooc_parser.parse('@import "test_at_import.kh"').body,
             [AtImport("test_at_import.kh")]
         )
+        self.assertRaises(
+            KoocImportError,
+            kooc_parser.parse,
+            '@import "test_at_import.kh"'
+        )
         self.assertRaises(Diagnostic, kooc_parser.parse, '@import filename')
         self.assertRaises(Diagnostic, kooc_parser.parse, '@import;')
 
