@@ -1,12 +1,13 @@
 import cnorm
-# from src.mangling import mangling
-# from src.object_list import ObjectList
+from src.mangling import mangling
+from src.object_list import ObjectList
 from pyrser.error import Diagnostic
 from src import kooc_parser
 from src import at_module
 
 import unittest
 
+par = cnorm.parsing.declaration.Declaration()
 kooc_parser = kooc_parser.KoocParser()
 
 class TestAtModule(unittest.TestCase):
@@ -23,40 +24,35 @@ class TestAtModule(unittest.TestCase):
         self.assertRaises(Diagnostic, kooc_parser.parse, "@module")
         self.assertRaises(Diagnostic, kooc_parser.parse, '@module "bar" {}')
 
-        # test de base
+        # tests de base
         parsed_module = kooc_parser.parse("@module foobar {int x;}")
         control_module = at_module.AtModule("foobar", par.parse("int x;").body)
-        # obj_list = ObjectList()
-        # to_check = par.parse("int a = 3;").body[0]
-        # to_check._name = mangling(to_check, "foo")
         self.assertEqual(parsed_module, control_module)
 
+        parsed_module1 = kooc_parser.parse("""
+        @module foobar_one {int x;
+        int x;
+        }
+        """)
+        control_module1 = at_module.AtModule("foobar_one", par.parse("int x; int x;").body)
+        self.assertEqual(parsed_module1, control_module1)
 
+    def test_transfo(self):
+        obj_list = ObjectList()
 
+        # test sans arg
+        control_module = at_module.AtModule("foo", [])
+        parsed_module = par.parse("")
+        self.assertEqual(control_module.get_c_ast(obj_list), parsed_module.body)
 
+        # tester avec un int
+        control_module = at_module.AtModule("bar", par.parse("int x;").body)
+        parsed_module = par.parse("int x;").body[0]
+        parsed_module._name = mangling(parsed_module, "bar")
+        self.assertEqual(control_module.get_c_ast(obj_list), [parsed_module])
 
-
-
-
-        # par = cnorm.parsing.declaration.Declaration()
-
-        
-        # # tester sans arg
-        # mod = at_module.AtModule("foo", [])
-        # obj_list = ObjectList()
-        # to_check = par.parse(str())
-        # self.assertEqual(mod.get_c_ast(obj_list), to_check.body)
-
-        # # tester sans nom
-        # # mod = at_module.AtModule(str(), par.parse("int a = 3;").body)
-        # self.assertRaises(TypeError, at_module.AtModule(str(), par.parse("int a = 3;").body))
-        # # obj_list = ObjectList()
-        # # to_check = par.parse(str())
-        # # self.assertEqual(mod.get_c_ast(obj_list), to_check.body)
-
-        # # tester avec un int
-        # mod = at_module.AtModule("foo", par.parse("int a = 3;").body)
-        # obj_list = ObjectList()
-        # to_check = par.parse("int a = 3;").body[0]
-        # to_check._name = mangling(to_check, "foo")
-        # self.assertEqual(mod.get_c_ast(obj_list), [to_check])
+        control_module = at_module.AtModule("bar", par.parse("int x; int y; int z;").body)
+        parsed_module = par.parse("int x; int y; int z;").body
+        for parsed in parsed_module:
+            parsed._name = mangling(parsed, "bar")
+        self.assertEqual(control_module.get_c_ast(obj_list), parsed_module)
