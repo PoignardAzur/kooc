@@ -17,42 +17,53 @@ class TestAtImport(unittest.TestCase):
     def test_parse_import(self):
         "Tests the parsing from KOOC text to KOOC AST"
 
+        ast_body = kooc_parser.parse('@import "tests/test_at_import.kh"').body
         self.assertEqual(
-            kooc_parser.parse('@import "test_at_import.kh"').body,
-            [AtImport("test_at_import.kh")]
+            ast_body,
+            [ AtImport("tests/test_at_import.kh", kooc_parser) ]
+        )
+        self.assertEqual(
+            ast_body[0].ast,
+            kooc_parser.parse_file("tests/test_at_import.kh")
         )
         self.assertRaises(
             KoocImportError,
-            kooc_parser.parse,
-            '@import "test_at_import.kh"'
+            kooc_parser.parse, '@import "wrong_file_name.kh"'
         )
+        self.assertRaises(
+            Diagnostic,
+            kooc_parser.parse, "@import 'tests/test_at_import.kh'"
+        )
+        self.assertRaises(KoocImportError, kooc_parser.parse, '@import "aaa"')
         self.assertRaises(Diagnostic, kooc_parser.parse, '@import filename')
         self.assertRaises(Diagnostic, kooc_parser.parse, '@import;')
 
     def test_get_c_ast(self):
         "Tests that the node is correctly transformed"
 
-        objects = ObjectList()
+        objs = ObjectList()
 
-        self.assertRaises(
-            KoocImportError,
-            AtImport("wrong_file_name.kh").get_c_ast, ObjectList()
-        )
-        self.assertEqual(
-            AtImport("test_at_import.kh").get_c_ast(objects),
-            c_parser.parse("""
-                #ifndef TEST_AT_IMPORT_H_
-                # define TEST_AT_IMPORT_H_
-                # include test_at_import.h
-                #endif /* !TEST_AT_IMPORT_H_ */
-            """).body
-        )
-        self.assertEqual(objects.list, [ AtModule("foobar", []) ])
+        c_ast = AtImport("tests/test_at_import.kh", kooc_parser).get_c_ast(objs)
+        control_ast = c_parser.parse("""
+            #ifndef TEST_AT_IMPORT_H_
+            # include "tests/test_at_import.h"
+            # define TEST_AT_IMPORT_H_
+            #endif /* !TEST_AT_IMPORT_H_ */
+        """)
+        self.assertEqual(len(c_ast), 4)
+        for i in range(0, 4):
+            self.assertEqual(c_ast[i].value, control_ast.body[i].value)
+
+        self.assertEqual(objs.list, [ AtModule("foobar", []) ])
 
     def test_remember_c_types(self):
         "Tests that types declared in imported files are known to the parser"
 
+        parse = kooc_parser.parse
         self.assertEqual(
-            kooc_parser.parse('@import "test_at_import.kh" CustomType x;').body[4],
-            kooc_parser.parse('typedef int CustomType; CustomType x;').body[1]
+            parse('@import "tests/test_at_import.kh" CustomType x;').body[1],
+            c_parser.parse('typedef int CustomType; CustomType x;').body[1]
         )
+
+    def test_import_protection():
+        pass

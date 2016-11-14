@@ -99,11 +99,15 @@ class KoocParser(grammar.Grammar, Declaration):
 @meta.hook(KoocParser)
 def add_kooc_decl(self, current_block, ast):
     current_block.ref.body.append(ast.contents)
+    if hasattr(ast, "types"):
+        for name, type_ast in ast.types.items():
+            current_block.ref.types[name] = type_ast
     return True
 
 @meta.hook(KoocParser)
 def create_import(self, ast, filename):
-    ast.contents = AtImport(self.value(filename).strip('"'))
+    ast.contents = AtImport(self.value(filename).strip('"'), KoocParser())
+    ast.types = ast.contents.ast.types
     return True
 
 @meta.hook(KoocParser)
