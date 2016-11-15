@@ -50,7 +50,8 @@ def main(argv = []):
         return False
     for arg in argv[1:]:
         if not Path(arg).is_file():
-            sys.stderr.write("Error: " + str(arg) + " does not exist or isn't a file\n")
+            sys.stderr.write("Error: " + str(arg) +
+                " does not exist or isn't a file\n")
             return False
         elif not parse_file(arg):
             return False
