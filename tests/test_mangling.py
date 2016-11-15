@@ -176,6 +176,155 @@ class TestMangling(unittest.TestCase):
         )
 
     def test_composed_types(self):
-        pass
+
+        composed_decl_list = c_parser.parse("""
+            char *c;
+            signed char *Sc;
+            unsigned char *Uc;
+            short *s;
+            short int *si;
+            signed short *Ss;
+            signed short int *Ssi;
+            unsigned short *Us;
+            unsigned short int *Usi;
+            int *i;
+            signed *S;
+            signed int *Si;
+            unsigned *U;
+            unsigned int *Ui;
+            long *l;
+            long int *li;
+            signed long *Sl;
+            signed long int *Sli;
+            unsigned long *Ul;
+            unsigned long int *Uli;
+            long long *ll;
+            long long int *lli;
+            signed long long *Sll;
+            signed long long int *Slli;
+            unsigned long long *Ull;
+            unsigned long long int *Ulli;
+            float *f;
+            double *d;
+            long double *ld;
+        """).body
+
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "c"), "Foobar"),
+            "_kooc_var_Foobar_c_Pchar"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Sc"), "Foobar"),
+            "_kooc_var_Foobar_Sc_Pschar"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Uc"), "Foobar"),
+            "_kooc_var_Foobar_Uc_Puchar"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "s"), "Foobar"),
+            "_kooc_var_Foobar_s_Pshort"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "si"), "Foobar"),
+            "_kooc_var_Foobar_si_Pshort"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Ss"), "Foobar"),
+            "_kooc_var_Foobar_Ss_Pshort"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Ssi"), "Foobar"),
+            "_kooc_var_Foobar_Ssi_Pshort"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Us"), "Foobar"),
+            "_kooc_var_Foobar_Us_Pushort"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Usi"), "Foobar"),
+            "_kooc_var_Foobar_Usi_Pushort"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "i"), "Foobar"),
+            "_kooc_var_Foobar_i_Pint"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "S"), "Foobar"),
+            "_kooc_var_Foobar_S_Pint"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Si"), "Foobar"),
+            "_kooc_var_Foobar_Si_Pint"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "U"), "Foobar"),
+            "_kooc_var_Foobar_U_Puint"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Ui"), "Foobar"),
+            "_kooc_var_Foobar_Ui_Puint"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "l"), "Foobar"),
+            "_kooc_var_Foobar_l_Plong"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "li"), "Foobar"),
+            "_kooc_var_Foobar_li_Plong"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Sl"), "Foobar"),
+            "_kooc_var_Foobar_Sl_Plong"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Sli"), "Foobar"),
+            "_kooc_var_Foobar_Sli_Plong"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Ul"), "Foobar"),
+            "_kooc_var_Foobar_Ul_Pulong"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Uli"), "Foobar"),
+            "_kooc_var_Foobar_Uli_Pulong"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "ll"), "Foobar"),
+            "_kooc_var_Foobar_ll_Pllong"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "lli"), "Foobar"),
+            "_kooc_var_Foobar_lli_Pllong"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Sll"), "Foobar"),
+            "_kooc_var_Foobar_Sll_Pllong"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Slli"), "Foobar"),
+            "_kooc_var_Foobar_Slli_Pllong"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Ull"), "Foobar"),
+            "_kooc_var_Foobar_Ull_Pullong"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "Ulli"), "Foobar"),
+            "_kooc_var_Foobar_Ulli_Pullong"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "f"), "Foobar"),
+            "_kooc_var_Foobar_f_Pfloat"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "d"), "Foobar"),
+            "_kooc_var_Foobar_d_Pdouble"
+        )
+        self.assertEqual(
+            mangling(find_decl(composed_decl_list, "ld"), "Foobar"),
+            "_kooc_var_Foobar_ld_Pldouble"
+        )
+
     def test_function_types(self):
         pass
