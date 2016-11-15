@@ -65,5 +65,5 @@ class TestAtImport(unittest.TestCase):
             c_parser.parse('typedef int CustomType; CustomType x;').body[1]
         )
 
-    def test_import_protection():
+    def test_import_protection(self):
         pass
