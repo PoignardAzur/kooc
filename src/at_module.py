@@ -1,6 +1,6 @@
 import copy
+from cnorm.nodes import FuncType
 from pyrser.parsing.node import Node
-
 from .mangling import mangling
 from .object_list import ObjectList
 
@@ -9,6 +9,9 @@ class AtModuleErrorMultiModule(Exception):
     pass
 
 class AtModuleErrorMultiObj(Exception):
+    pass
+
+class AtModuleErrorNotInlineFonction(Exception):
     pass
 
 class AtModule(Node):
@@ -25,6 +28,8 @@ class AtModule(Node):
         module_list.add_module(self)
         c_fields = copy.deepcopy(self.fields)
         for field in c_fields:
+            if type(field._ctype) is FuncType and hasattr(field, "body") and field._ctype._storage != 5:
+                raise AtModuleErrorNotInlineFonction
             field._name = mangling(field, field._name)
             if field._name in check:
                 raise AtModuleErrorMultiObj

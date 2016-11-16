@@ -1,6 +1,7 @@
 import cnorm
 from src.at_module import AtModuleErrorMultiModule
 from src.at_module import AtModuleErrorMultiObj
+from src.at_module import AtModuleErrorNotInlineFonction
 from src.mangling import mangling
 from src.object_list import ObjectList
 from pyrser.error import Diagnostic
@@ -47,7 +48,7 @@ class TestAtModule(unittest.TestCase):
         parsed_module = par.parse("")
         self.assertEqual(control_module.get_c_ast(obj_list), parsed_module.body)
 
-        # tester avec un int
+        # test avec un int
         control_module = at_module.AtModule("bar", par.parse("int x;").body)
         parsed_module = par.parse("int x;").body[0]
         parsed_module._name = mangling(parsed_module, "bar")
@@ -58,7 +59,6 @@ class TestAtModule(unittest.TestCase):
         for parsed in parsed_module:
             parsed._name = mangling(parsed, "foobar")
         self.assertEqual(control_module.get_c_ast(obj_list), parsed_module)
-
 
     def test_error(self):
         obj_list = ObjectList()
@@ -71,6 +71,13 @@ class TestAtModule(unittest.TestCase):
         # test variable avec le même mangling
         t2 = at_module.AtModule("bar", par.parse("int x; int x;").body)
         self.assertRaises(AtModuleErrorMultiObj, t2.get_c_ast, obj_list)
-
         t3 = at_module.AtModule("foobar", par.parse("int x; static int x;").body)
         self.assertRaises(AtModuleErrorMultiObj, t3.get_c_ast, obj_list)
+
+        # test fonctions implémentées
+        t4 = at_module.AtModule("foobaar", par.parse("int x() {return (2);}").body)
+        self.assertRaises(AtModuleErrorNotInlineFonction, t4.get_c_ast, obj_list)
+
+        # dégager les variables statics
+        # t3 = at_module.AtModule("foobar", par.parse("int x; static int x;").body)
+        # self.assertRaises(AtModuleErrorMultiObj, t3.get_c_ast, obj_list)
