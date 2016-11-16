@@ -86,10 +86,10 @@ class KoocParser(grammar.Grammar, Declaration):
                 __scope__:current_block
                 #new_composed(_, current_block)
                 '.' Base.id:var_name
-                | Base.id:func_name [ ':' kooc_type? Expression.expression:expr ]*
+                | Base.id:func_name [ ':' kooc_type? Declaration.expression:expr ]*
             ]
             ']'
-            #create_call(decl_ast, module_name, var_name, func_name, current_block);
+            #create_call(decl_ast, module_name, var_name, func_name, expr);
         ]
 
         kooc_type =
@@ -126,9 +126,9 @@ def create_implem(self, ast, contents, module_name):
 @meta.hook(KoocParser)
 def create_call(self, ast, module_name, var_name, func_name, expr):
     if func_name is not None:
-        ast.contents = KoocCall(self.value(module_name), self.value(func_name), True, expr.ref.body)
+        ast.contents = KoocCall(self.value(module_name), self.value(func_name), True, expr)
     else:
-        ast.contents = KoocCall(self.value(module_name), self.value(var_name), False, expr.ref.body)
+        ast.contents = KoocCall(self.value(module_name), self.value(var_name), False, expr)
     return True
 
 defaultKoocParser = KoocParser()
