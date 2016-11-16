@@ -68,12 +68,12 @@ class KoocParser(grammar.Grammar, Declaration):
 
             #create_implem(decl_ast,current_block,module_name)
         ]
-/*
+
         primary_expression =
         [
             // Creates weird errors; should examine Expression source before
             // uncommenting
-            Expression.primary_expression
+            Declaration.primary_expression
             | kooc_call
         ]
 
@@ -83,17 +83,20 @@ class KoocParser(grammar.Grammar, Declaration):
             '['
             Base.id:module_name
             [
+                __scope__:current_block
+                #new_composed(_, current_block)
                 '.' Base.id:var_name
                 | Base.id:func_name [ ':' kooc_type? Expression.expression:expr ]*
             ]
             ']'
+            #create_call(decl_ast, module_name, var_name, func_name, current_block);
         ]
 
         kooc_type =
         [
             "@!(" Base.id:typename ")"
         ]
-*/
+
     """
 
 @meta.hook(KoocParser)
@@ -118,6 +121,14 @@ def create_module(self, ast, contents, module_name):
 @meta.hook(KoocParser)
 def create_implem(self, ast, contents, module_name):
     ast.contents = AtImplementation(self.value(module_name), contents.ref.body)
+    return True
+
+@meta.hook(KoocParser)
+def create_call(self, ast, module_name, var_name, func_name, expr):
+    if func_name is not None:
+        ast.contents = KoocCall(self.value(module_name), self.value(func_name), True, expr.ref.body)
+    else:
+        ast.contents = KoocCall(self.value(module_name), self.value(var_name), False, expr.ref.body)
     return True
 
 defaultKoocParser = KoocParser()
