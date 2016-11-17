@@ -1,7 +1,11 @@
+from cnorm.nodes import *
 from pyrser.parsing.node import Node
 
 from .mangling import mangling
 from .object_list import ObjectList
+
+class KoocCallErrorNotExistingModule(Exception):
+    pass
 
 class KoocCall(Node):
 
@@ -14,7 +18,19 @@ class KoocCall(Node):
 
     def get_c_ast(self, module_list: ObjectList) :
         # TODO
-        return []
+        decl = int(0)
+        for tmp in module_list.list :
+            if tmp.name == self.module_name :
+                for tmp_var in tmp.fields :
+                    if tmp_var._name.find(self.name) != -1 :
+                        decl = tmp_var
+                        break
+        if type(decl) is int :
+            raise KoocCallErrorNotExistingModule
+        if type(decl._ctype) is FuncType :
+            return Func(Id(value=decl._name), self.args)
+        else:
+            return Id(value=decl._name)
 
 
 def convert_all_kooc_calls(node_list: list, object_list: ObjectList):

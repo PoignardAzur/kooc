@@ -89,7 +89,7 @@ class KoocParser(grammar.Grammar, Declaration):
                 | Base.id:func_name [ ':' kooc_type? Declaration.expression:expr ]*
             ]
             ']'
-            #create_call(decl_ast, module_name, var_name, func_name, expr);
+            #create_call(decl_ast, module_name, var_name, func_name, expr)
         ]
 
         kooc_type =

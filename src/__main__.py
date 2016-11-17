@@ -36,7 +36,7 @@ def parse_file(filename: str):
         convert_ast(node, object_list)
         convert_all_kooc_calls(node.body, object_list)
         file = open(convert_filename(filename), "w")
-        file.write(str(node.to_c()))
+        # file.write(str(node.to_c()))
         file.close()
     except Diagnostic as diag:
         sys.stderr.write("Parsing error: " + str(diag) + "\n")
