@@ -15,17 +15,21 @@ kooc_parser = kooc_parser.KoocParser()
 
 class TestAtModule(unittest.TestCase):
 
-    def test_parsing(self):
+    def test_parsing_noargs(self):
 
         # test sans arg
         parsed_module = kooc_parser.parse("@module foo {}").body[0]
         control_module = at_module.AtModule("foo", [])
         self.assertEqual(parsed_module, control_module)
 
+    def test_parsing_noname(self):
+
         # test sans nom
         self.assertRaises(Diagnostic, kooc_parser.parse, "@module {}")
         self.assertRaises(Diagnostic, kooc_parser.parse, "@module")
         self.assertRaises(Diagnostic, kooc_parser.parse, '@module "bar" {}')
+
+    def test_module_base(self):
 
         # tests de base
         parsed_module = kooc_parser.parse("@module foobar {int x;}")
@@ -40,7 +44,7 @@ class TestAtModule(unittest.TestCase):
         control_module1 = at_module.AtModule("foobar_one", par.parse("int x; int x;").body)
         self.assertEqual(parsed_module1, control_module1)
 
-    def test_transfo(self):
+    def test_transfo_noargs(self):
         obj_list = ObjectList()
 
         # test sans arg
@@ -48,19 +52,26 @@ class TestAtModule(unittest.TestCase):
         parsed_module = par.parse("")
         self.assertEqual(control_module.get_c_ast(obj_list), parsed_module.body)
 
+    def test_transfo_int(self):
+        obj_list = ObjectList()
+
         # test avec un int
         control_module = at_module.AtModule("bar", par.parse("int x;").body)
         parsed_module = par.parse("int x;").body[0]
         parsed_module._name = mangling(parsed_module, "bar")
         self.assertEqual(control_module.get_c_ast(obj_list), [parsed_module])
 
+    def test_transfo_moreints(self):
+        obj_list = ObjectList()
+
+        # test avec plus d'ints
         control_module = at_module.AtModule("foobar", par.parse("int x; int y; int z;").body)
         parsed_module = par.parse("int x; int y; int z;").body
         for parsed in parsed_module:
             parsed._name = mangling(parsed, "foobar")
         self.assertEqual(control_module.get_c_ast(obj_list), parsed_module)
 
-    def test_error(self):
+    def test_error_samemodules(self):
         obj_list = ObjectList()
 
         # test multi-module avec le même nom
@@ -68,11 +79,17 @@ class TestAtModule(unittest.TestCase):
         t1 = at_module.AtModule("foo", [])
         self.assertRaises(AtModuleErrorMultiModule, t1.get_c_ast, obj_list)
 
+    def test_error_samevariables(self):
+        obj_list = ObjectList()
+
         # test variable avec le même mangling
         t2 = at_module.AtModule("bar", par.parse("int x; int x;").body)
         self.assertRaises(AtModuleErrorMultiObj, t2.get_c_ast, obj_list)
         t3 = at_module.AtModule("foobar", par.parse("int x; static int x;").body)
         self.assertRaises(AtModuleErrorMultiObj, t3.get_c_ast, obj_list)
+
+    def test_error_implementedfunctions(self):
+        obj_list = ObjectList()
 
         # test fonctions implémentées
         t4 = at_module.AtModule("foobaar", par.parse("int x() {return (2);}").body)
