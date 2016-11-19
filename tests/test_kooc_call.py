@@ -14,7 +14,7 @@ class TestKoocCall(unittest.TestCase) :
     def test_parsing(self) :
 
         parsed_module = kooc_parser.parse("[A.v]").body[0]
-        control_module = kooc_call.KoocCall("A", "v", False, None)
+        control_module = kooc_call.KoocCall("A", "v", False, [])
         self.assertEqual(parsed_module, control_module)
 
         parsed_module = kooc_parser.parse("[A f]").body[0]

@@ -28,9 +28,9 @@ class KoocCall(Node):
         if type(decl) is int :
             raise KoocCallErrorNotExistingModule
         if type(decl._ctype) is FuncType :
-            return Func(Id(value=decl._name), self.args)
+            return Func(Id(decl._name), self.args)
         else:
-            return Id(value=decl._name)
+            return Id(decl._name)
 
 
 def convert_all_kooc_calls(node_list: list, object_list: ObjectList):
