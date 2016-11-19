@@ -7,10 +7,10 @@ def wichdecl(decl):
         return "_var"
 
 def mangl_pointer(decl):
-    if type(decl._decltype) is PointerType:
-        return "P" + mangl_pointer(decl._decltype)
-    elif type(decl._decltype) is QualType:
-        return "" + mangl_pointer(decl._decltype)
+    if type(decl._ctype._decltype) is PointerType:
+        return "P"
+    elif type(decl._ctype._decltype) is QualType:
+        return ""
     else:
         return ""
 
