@@ -4,17 +4,33 @@ from pyrser.hooks.set import set_node
 from cnorm.parsing.declaration import Declaration
 from cnorm.passes import to_c
 
+from .import_handler import ImportHandler
 from .at_import import AtImport
 from .at_module import AtModule
 from .at_implementation import AtImplementation
 from .kooc_call import KoocCall
 
+
 class KoocParser(grammar.Grammar, Declaration):
     """Transforms text in KOOC format to a KOOC AST"""
+
+    def __init__(self, import_handler, working_file = "-"):
+        grammar.Grammar.__init__(self)
+        Declaration.__init__(self)
+        self.ih = import_handler
+        self.working_file = working_file
 
     entry = "translation_unit"
 
     grammar = """
+        translation_unit =
+        [
+            __scope__:kooc_root
+            #init_root(kooc_root)
+
+            Declaration.translation_unit:>_
+        ]
+
         declaration =
         [
             Declaration.declaration
@@ -97,6 +113,11 @@ class KoocParser(grammar.Grammar, Declaration):
     """
 
 @meta.hook(KoocParser)
+def init_root(self, kooc_root):
+    kooc_root.files = {}
+    return True
+
+@meta.hook(KoocParser)
 def add_kooc_decl(self, current_block, ast):
     current_block.ref.body.append(ast.contents)
     if hasattr(ast, "types"):
@@ -106,7 +127,11 @@ def add_kooc_decl(self, current_block, ast):
 
 @meta.hook(KoocParser)
 def create_import(self, ast, filename):
-    ast.contents = AtImport(self.value(filename).strip('"'), KoocParser())
+    ast.contents = AtImport(
+        self.working_file,
+        self.value(filename).strip('"'),
+        self.ih
+    )
     ast.types = ast.contents.ast.types
     return True
 
@@ -120,4 +145,4 @@ def create_implem(self, ast, contents, module_name):
     ast.contents = AtImplementation(self.value(module_name), contents.ref.body)
     return True
 
-defaultKoocParser = KoocParser()
+defaultKoocParser = KoocParser(ImportHandler())
