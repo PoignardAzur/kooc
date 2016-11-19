@@ -22,20 +22,44 @@ class TestAtImport(unittest.TestCase):
             ast_body,
             [ AtImport("tests/test_at_import.kh", kooc_parser) ]
         )
+
+    def test_parse_import_body(self):
+
+        ast_body = kooc_parser.parse('@import "tests/test_at_import.kh"').body
         self.assertEqual(
             ast_body[0].ast,
             kooc_parser.parse_file("tests/test_at_import.kh")
         )
+
+    def test_parse_import_error_wrongfile(self):
+
+        ast_body = kooc_parser.parse('@import "tests/test_at_import.kh"').body
         self.assertRaises(
             KoocImportError,
             kooc_parser.parse, '@import "wrong_file_name.kh"'
         )
+
+    def test_parse_import_error_diagnostic(self):
+
+        ast_body = kooc_parser.parse('@import "tests/test_at_import.kh"').body
         self.assertRaises(
             Diagnostic,
             kooc_parser.parse, "@import 'tests/test_at_import.kh'"
         )
+
+    def test_parse_import_error_invalidname(self):
+
+        ast_body = kooc_parser.parse('@import "tests/test_at_import.kh"').body
         self.assertRaises(KoocImportError, kooc_parser.parse, '@import "aaa"')
+
+    def test_parse_import_error_noquotes(self):
+
+        ast_body = kooc_parser.parse('@import "tests/test_at_import.kh"').body
         self.assertRaises(Diagnostic, kooc_parser.parse, '@import filename')
+
+    def test_parse_import_error_nofile(self):
+
+        ast_body = kooc_parser.parse('@import "tests/test_at_import.kh"').body
         self.assertRaises(Diagnostic, kooc_parser.parse, '@import;')
 
     def test_get_c_ast(self):
