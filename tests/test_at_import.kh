@@ -1,0 +1,3 @@
+typedef int CustomType;
+
+@module foobar {}

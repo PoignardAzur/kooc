@@ -11,5 +11,5 @@ class TestMain(unittest.TestCase):
         self.assertFalse(__main__.main(argv))
 
     def test_simple_file(self):
-        argv = ["test", "tests/test.kc"]
+        argv = ["test", "tests/test_all.kc"]
         self.assertTrue(__main__.main(argv))

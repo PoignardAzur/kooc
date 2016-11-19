@@ -5,6 +5,7 @@ from pathlib import Path
 from pyrser.error import Diagnostic
 
 from .kooc_parser import KoocParser
+from .import_handler import ImportHandler
 from .kooc_call import convert_all_kooc_calls
 from .object_list import ObjectList
 
@@ -31,7 +32,8 @@ def convert_filename(filename: str):
 def parse_file(filename: str):
     print("Parsing file " + filename)
     try:
-        node = KoocParser().parse_file(filename)
+        ih = ImportHandler()
+        node = KoocParser(ih, "").parse_file(filename)
         object_list = ObjectList()
         convert_ast(node, object_list)
         convert_all_kooc_calls(node.body, object_list)
@@ -50,7 +52,8 @@ def main(argv = []):
         return False
     for arg in argv[1:]:
         if not Path(arg).is_file():
-            sys.stderr.write("Error: " + str(arg) + " does not exist or isn't a file\n")
+            sys.stderr.write("Error: " + str(arg) +
+                " does not exist or isn't a file\n")
             return False
         elif not parse_file(arg):
             return False
