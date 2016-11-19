@@ -9,11 +9,13 @@ class ErrorClass():
                   self.filepath = diagnostic.location.filepath
                   self.col = diagnostic.location.col
                   self.line = diagnostic.location.line
+                  self.diagnostic = True
             else :
                   self.msg = msg
                   self.filepath = details
                   self.col = col
                   self.line = line
+                  self.diagnostic = False
 
 def my_get_content(self) -> str:
     f = open(self.filepath, 'r')
