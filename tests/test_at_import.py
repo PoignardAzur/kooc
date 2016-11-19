@@ -26,6 +26,21 @@ class TestAtImport(unittest.TestCase):
             ast_body[0].ast,
             kooc_parser.parse_file("tests/test_at_import.kh")
         )
+
+        ast_body = kooc_parser.parse('@import "tests/test_at_import_c.h"').body
+        self.assertEqual(
+            ast_body,
+            [ AtImport("tests/test_at_import_c.h", kooc_parser) ]
+        )
+        self.assertEqual(
+            ast_body[0].ast,
+            c_parser.parse_file("tests/test_at_import_c.h")
+        )
+        self.assertRaises(
+            KoocImportError,
+            kooc_parser.parse, '@import "test_incorrect_import_c.h"'
+        )
+
         self.assertRaises(
             KoocImportError,
             kooc_parser.parse, '@import "wrong_file_name.kh"'
@@ -64,6 +79,12 @@ class TestAtImport(unittest.TestCase):
             parse('@import "tests/test_at_import.kh" CustomType x;').body[1],
             c_parser.parse('typedef int CustomType; CustomType x;').body[1]
         )
+        self.assertEqual(
+            parse('@import "tests/test_at_import.h" CustomType2 x;').body[1],
+            c_parser.parse('typedef int CustomType2; CustomType2 x;').body[1]
+        )
 
     def test_import_protection(self):
-        pass
+        "Tests that import is protected against double inclusion"
+
+        kooc_parser.parse_file('tests/test_double_import.kh')
