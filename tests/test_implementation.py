@@ -15,9 +15,9 @@ implem_empty =
     }
 """
 
-AtModule("Variable", [par.parse("int x;"),
-                      par.parse("int y = 3;"),
-                      par.parse("float x;")])
+AtModule("Variable", [par.parse("int x;").body[0],
+                      par.parse("int y = 3;").body[0],
+                      par.parse("float x;").body[0]])
 
 implem_only_variable =
 """
@@ -26,9 +26,9 @@ implem_only_variable =
     }
 """
 
-AtModule("Function", [par.parse("int func1(int x);"),
-                      par.parse("int func2();"),
-                      par.parse("void func1(char a, char b, int *c);")])
+AtModule("Function", [par.parse("int func1(int x);").body[0],
+                      par.parse("int func2();").body[0],
+                      par.parse("void func1(char a, char b, int *c);").body[0]])
 
 implem_only_function =
 """
@@ -50,12 +50,13 @@ implem_only_function =
         }
     }
 """
-AtModule("All", [par.parse("int x;"),
-                 par.parse("int y = 3;"),
-                 par.parse("float x;"),
-                 par.parse("int func1(int x);"),
-                 par.parse("int func2();"),
-                 par.parse("void func1(char a, char b, int *c);")])
+
+AtModule("All", [par.parse("int x;").body[0],
+                 par.parse("int y = 3;").body[0],
+                 par.parse("float x;").body[0],
+                 par.parse("int func1(int x);").body[0],
+                 par.parse("int func2();").body[0],
+                 par.parse("void func1(char a, char b, int *c);").body[0]])
 
 implem_all =
 """
@@ -79,4 +80,11 @@ implem_all =
 """
 
 
-class TestImplement(unittest.TestCase) :
+class TestParseImplement(unittest.TestCase) :
+    "Test Parsing for @implementation"
+
+    self.assertEqual(
+    KoocParser.parse(implem_empty).body[0],
+    AtImplementation("Empty", [])
+    )
+
