@@ -12,19 +12,8 @@ class ErrorClass():
                   self.line = line
                   self.diagnostic = False
 
-      def __init__(self, diagnostic: error.Notification):
-
-                  self.msg = diagnostic.get_content(True, True)
-                  self.filepath = diagnostic.location.filepath
-                  self.col = diagnostic.location.col
-                  self.line = diagnostic.location.line
-                  self.diagnostic = True
-
       def get_error_message(self):
-            if self.diagnostic is True :
-                  return self.msg
-            else :
-                  new_msg = "In file " + self.filepath + " at line " + self.line + " and column " + self.col + ": \n" + self.msg
+            new_msg = "In file " + self.filepath + " at line " + self.line + " and column " + self.col + ": \n" + self.msg
             return new_msg
 
       def output_Warning(self):
