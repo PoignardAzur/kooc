@@ -12,20 +12,28 @@ kooc_parser = kooc_parser.KoocParser()
 class TestKoocCall(unittest.TestCase) :
 
     def test_parsing(self) :
-
         parsed_module = kooc_parser.parse("[A.v]").body[0]
         control_module = kooc_call.KoocCall("A", "v", False, [])
         self.assertEqual(parsed_module, control_module)
 
+    def test_parsing1(self) :
         parsed_module = kooc_parser.parse("[A f]").body[0]
         control_module = kooc_call.KoocCall("A", "f", True, [])
         self.assertEqual(parsed_module, control_module)
-
-        parsed_module = kooc_parser.parse("[A f : 4]").body[0]
+        
+    def test_parsing2(self) :
+        parsed_module = kooc_parser.parse("[A f : e]").body[0]
         control_module = kooc_call.KoocCall("A", "f", True, [cnorm.nodes.Literal("4")])
         self.assertEqual(parsed_module, control_module)
 
+    def test_parsing3(self) :    
         parsed_module = kooc_parser.parse("[A f : [A.v]]").body[0]
         control_module = kooc_call.KoocCall("A", "f", True, [kooc_parser.parse("[A.v]")])
         self.assertEqual(parsed_module, control_module)
 
+    def test_parsing4(self) :        
+        parsed_module = kooc_parser.parse("@!(long)[A.v]"
+        ).body[0]
+        control_module = kooc_call.KoocCall("A", "f", True, [kooc_parser.parse("[A.v]")])
+        self.assertEqual(parsed_module, control_module)
+        

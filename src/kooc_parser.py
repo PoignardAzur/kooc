@@ -73,37 +73,31 @@ class KoocParser(grammar.Grammar, Declaration):
         [
             // Creates weird errors; should examine Expression source before
             // uncommenting
-            Declaration.primary_expression
-            | kooc_call
+            Declaration.primary_expression:>_
+            | kooc_call:>_
         ]
 
-        kooc_call =
+       kooc_call = 
         [
-            kooc_type?
+            [kooc_type]*
             "["
             Base.id:module_name
             [
-                __scope__:current_block
-                #new_composed(_, current_block)
-                ["." Base.id:var_name #printe(_)]
-                | [Base.id:func_name [ ':' kooc_type? Declaration.expression:expr ]*]
+                ["." Base.id:var_name #create_call_var(_, module_name, var_name)]
+                | [Base.id:func_name #create_call_func(_, module_name, func_name)
+                   [ ':' [kooc_type]* Expression.expression:expr #create_call_func_addExpr(_, expr)]*
+                   #create_call_func_push(_)]
             ]
             "]"
-            #create_call(decl_ast, module_name, var_name, func_name, expr)
         ]
 
         kooc_type =
         [
-            "@!(" Base.id:typename ")"
+            "@!(" Base.id ")"
         ]
 
     """
-
-@meta.hook(KoocParser)
-def printe(self, current_block) :
-    print("ça passe la dedant")
-    return True
-
+    
 @meta.hook(KoocParser)
 def add_kooc_decl(self, current_block, ast):
     current_block.ref.body.append(ast.contents)
@@ -129,12 +123,24 @@ def create_implem(self, ast, contents, module_name):
     return True
 
 @meta.hook(KoocParser)
-def create_call(self, ast, module_name, var_name, func_name, expr):
-    print (module_name, " var : ", var_name, " func ", func_name, " expr ", expr);
-    if func_name is not None:
-        ast.contents = KoocCall(self.value(module_name), self.value(func_name), True, expr)
-    else:
-        ast.contents = KoocCall(self.value(module_name), self.value(var_name), False, expr)
+def create_call_var(self, ast, module_name, var_name):
+    ast.set(KoocCall(self.value(module_name), self.value(var_name), False, None))
     return True
 
+@meta.hook(KoocParser)
+def create_call_func(self, ast, module_name, func_name):
+    ast.typeExpr = self.value(typeExpr)
+    ast.module = self.value(module_name)
+    ast.func = self.value(func_name)
+    ast.expr = []
+
+@meta.hook(KoocParser)
+def create_call_func_addExpr(self, ast, Expr):
+    ast.expr.append(self.value(Expr))
+
+@meta.hook(KoocParser)
+def create_call_func_push(self, ast) :
+    ast.set(KoocCall(ast.module_name, ast.func, True, ast.expr))
+    return True
+ 
 defaultKoocParser = KoocParser()
