@@ -3,6 +3,7 @@ import copy
 from pyrser import meta, grammar
 from pyrser.parsing.node import Node
 from cnorm.nodes import FuncType
+from cnorm.nodes import Storages, Qualifiers, Specifiers, Signs
 from cnorm.parsing.declaration import Declaration
 
 from .mangling import mangling
@@ -36,13 +37,7 @@ def create_module(self, ast, module_name):
     return True
 
 
-class AtModuleErrorMultiModule(Exception):
-    pass
-
-class AtModuleErrorMultiObj(Exception):
-    pass
-
-class AtModuleErrorNotInlineFonction(Exception):
+class AtModuleError(Exception):
     pass
 
 class AtModule(Node):
@@ -51,18 +46,33 @@ class AtModule(Node):
         self.name = name
         self.fields = fields
 
-    def get_c_ast(self, module_list: ObjectList) :
-        check = list()
-        for ob_list in module_list.list:
-            if self.name == ob_list.name:
-                raise AtModuleErrorMultiModule
+    def convert_node(self, node):
+        storage = node._ctype._storage
+        if storage == Storages.TYPEDEF:
+            raise AtModuleError
+        if storage == Storages.STATIC:
+            raise AtModuleError
+        if storage == Storages.EXTERN:
+            raise AtModuleError
+        if hasattr(node, "body") and storage != Storages.INLINE:
+            raise AtModuleError
+        if hasattr(node, "body"):
+            node._ctype._storage = Storages.STATIC
+        elif type(node._ctype) is not FuncType:
+            node._ctype._storage = Storages.EXTERN
+        node._name = mangling(node, node._name)
+
+    def get_c_ast(self, module_list: ObjectList):
+
+        if module_list.find_object(self.name):
+            raise AtModuleError()
         module_list.add_module(self)
+
         c_fields = copy.deepcopy(self.fields)
+        field_names = []
         for field in c_fields:
-            if type(field._ctype) is FuncType and hasattr(field, "body") and field._ctype._storage != 5:
-                raise AtModuleErrorNotInlineFonction
-            field._name = mangling(field, field._name)
-            if field._name in check:
-                raise AtModuleErrorMultiObj
-            check.append(field._name)
+            self.convert_node(field)
+            if field._name in field_names:
+                raise AtModuleError
+            field_names.append(field._name)
         return c_fields
