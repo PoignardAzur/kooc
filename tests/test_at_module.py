@@ -9,7 +9,7 @@ from pyrser.error import Diagnostic
 
 import unittest
 
-ih = ImportHandler()
+ih = ImportHandler(silent = True)
 par = cnorm.parsing.declaration.Declaration()
 kooc_parser = kooc_parser.KoocParser(ih)
 

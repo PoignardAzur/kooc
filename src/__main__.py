@@ -19,7 +19,7 @@ def convert_filename(filename: str):
 
 
 def parse_file(filename: str, silent: bool):
-    ih = ImportHandler()
+    ih = ImportHandler(silent)
     node = parse_kooc_file(ih, "", filename, silent)
     if node is None:
         return False

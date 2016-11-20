@@ -86,6 +86,3 @@ def convert_ast(ast, object_list: ObjectList):
         decl_list.extend(convert_node(decl, object_list))
     convert_all_kooc_calls(decl_list, object_list)
     return RootBlockStmt(decl_list)
-
-
-defaultKoocParser = KoocParser(ImportHandler())
