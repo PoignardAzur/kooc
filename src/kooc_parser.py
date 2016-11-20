@@ -79,14 +79,15 @@ class KoocParser(grammar.Grammar, Declaration):
 
        kooc_call = 
         [
-            [kooc_type]*
+            [kooc_type:type #set_type(_, type)]? 
             "["
             Base.id:module_name
             [
                 ["." Base.id:var_name #create_call_var(_, module_name, var_name)]
-                | [Base.id:func_name #create_call_func(_, module_name, func_name)
-                   [ ':' [kooc_type]* Expression.expression:expr #create_call_func_addExpr(_, expr)]*
-                   #create_call_func_push(_)]
+                |
+                [ Base.id:func_name #create_call_func(_, module_name, func_name)
+                [ ":" kooc_type? Expression.expression:expr #create_call_func_addExpr(_, expr)]* 
+                #create_call_func_push(_)]
             ]
             "]"
         ]
@@ -97,7 +98,6 @@ class KoocParser(grammar.Grammar, Declaration):
         ]
 
     """
-    
 @meta.hook(KoocParser)
 def add_kooc_decl(self, current_block, ast):
     current_block.ref.body.append(ast.contents)
@@ -123,24 +123,37 @@ def create_implem(self, ast, contents, module_name):
     return True
 
 @meta.hook(KoocParser)
+def set_type(self, ast, typee):
+    ast.typee = self.value(typee)[3:]
+    ast.typee = ast.typee[:-1]
+    return True
+
+@meta.hook(KoocParser)
 def create_call_var(self, ast, module_name, var_name):
-    ast.set(KoocCall(self.value(module_name), self.value(var_name), False, None))
+    typeExpr = ""
+    if hasattr(ast, "typee"):
+        typeExpr = ast.typee            
+    ast.set(KoocCall(self.value(module_name), self.value(var_name), typeExpr, False, None))
     return True
 
 @meta.hook(KoocParser)
 def create_call_func(self, ast, module_name, func_name):
-    ast.typeExpr = self.value(typeExpr)
+    ast.typeExpr = ""
+    if hasattr(ast, "typee"):
+        ast.typeExpr = ast.typee
     ast.module = self.value(module_name)
     ast.func = self.value(func_name)
     ast.expr = []
+    return True
 
 @meta.hook(KoocParser)
 def create_call_func_addExpr(self, ast, Expr):
     ast.expr.append(self.value(Expr))
-
+    return True
+    
 @meta.hook(KoocParser)
 def create_call_func_push(self, ast) :
-    ast.set(KoocCall(ast.module_name, ast.func, True, ast.expr))
+    ast.set(KoocCall(ast.module, ast.func, ast.typeExpr, True, ast.expr))
     return True
  
 defaultKoocParser = KoocParser()

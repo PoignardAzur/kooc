@@ -7,30 +7,53 @@ from .object_list import ObjectList
 class KoocCallErrorNotExistingModule(Exception):
     pass
 
+class KoocCallErrorNotExistingField(Exception):
+    pass
+
+class KoocCallErrorNotExistingType(Exception):
+    pass
+
 class KoocCall(Node):
 
-    def __init__(self, module_name: str, name: str, isFunc = False, args = []):
+    def __init__(self, module_name: str, name: str, typee : str, isFunc = False, args = []):
         #args: List<cnorm.nodes.Expr>
         self.module_name = module_name
         self.name = name
         self.isFunc = isFunc
         self.args = args
+        self.typeExpr = typee
 
     def get_c_ast(self, module_list: ObjectList) :
-        # TODO
-        print ("LES MODULES ", module_list.list, "\n\n")
         decl = int(0)
+        found_module = 0
+        found_var = 0
+        found_type = 0
         for tmp in module_list.list :
             if tmp.name == self.module_name :
-                print("LE MODULE ", tmp.name, "\n\n")
+                found_module = 1
                 for tmp_var in tmp.fields :
-                    if tmp_var._name.find(self.name) != -1 :
-                        decl = tmp_var
-                        break
-        if type(decl) is int :
+                    mangled = mangling(tmp_var, self.module_name)
+                    if tmp_var._name.find(self.name) != -1 and mangled.find(self.typeExpr) != -1:
+                        found_var = 1
+                        if self.isFunc == False and mangled.find("_var") != -1:
+                            found_type = 1
+                            decl = tmp_var
+                            break
+                        elif self.isFunc == True and mangled.find("_func") != -1:
+                            decl = tmp_var
+                            found_type = 1
+                            break
+
+        if found_module == 0:
             raise KoocCallErrorNotExistingModule
-        print ("LA DECLARATION ", decl, "\n\n")
+        if found_var == 0:
+            raise KoocCallErrorNotExistingField
+        if found_type == 0:
+            raise KoocCallErrorNotExistingType
+                            
         if type(decl._ctype) is FuncType :
+            for arg in self.args:
+                arg = handl_composed(arg, module_list)
             return Func(Id(mangling(decl, self.module_name)), self.args)
         else:
             return Id(mangling(decl, self.module_name))
@@ -51,6 +74,8 @@ def handl_composed(object_list : ObjectList, node):
         node = handl_expr(object_list, node)
     elif type(node) is BlockStmt:
         node = handl_blockStmt(object_list, node)
+    elif type(node) is ExprStmt:
+        node = handl_exprstmt(object_list, node)
     return node
 
 #Type Func
@@ -97,17 +122,11 @@ def handl_blockStmt(object_list: ObjectList, node) :
         node_tmp = handl_composed(object_list, node_tmp)
     return node
 
-def iter_all_attr(object_list: ObjectList, node):
-    for tmp in dir(node):
-        if not tmp.startswith('__'):
-            if type(getattr(node, tmp)) is KoocCall:
-                setattr(node, tmp, getattr(node, tmp))
-        
-
+def handl_exprstmt(object_list, node) :
+    node.expr = handl_composed(object_list, node.expr)
+    return node
+                                     
 def convert_all_kooc_calls(node_list: list, object_list: ObjectList):
     for node in node_list :
-        print("AVANT ", node, "\n\n")
         node = handl_composed(object_list, node)
-        print("APRES", node, "\n\n")
     return node_list
-        

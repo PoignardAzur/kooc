@@ -30,7 +30,7 @@ class AtModule(Node):
         for field in c_fields:
             if type(field._ctype) is FuncType and hasattr(field, "body") and field._ctype._storage != 5:
                 raise AtModuleErrorNotInlineFonction
-            field._name = mangling(field, field._name)
+            field._name = mangling(field, self.name)
             if field._name in check:
                 raise AtModuleErrorMultiObj
             check.append(field._name)
