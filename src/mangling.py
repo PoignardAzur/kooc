@@ -2,9 +2,9 @@ from cnorm.nodes import *
 
 def wichdecl(decl):
     if type(decl._ctype) is FuncType :
-        return "_var"
-    else :
         return "_func"
+    else :
+        return "_var"
 
 def mangl_pointer(decl):
     if type(decl._decltype) is PointerType:
@@ -16,14 +16,14 @@ def mangl_pointer(decl):
 
 def mangl_array(decl):
     return "A" + decl._ctype._expr.value
-    
+
 mangl_tab = {
     "char" : {0 : "char"},
     "int" : {0 : "int", 4 : "long", 5 : "llong", 6 : "short"},
     "float" : {0 : "float"},
-    "double" : {0 : "double"}
+    "double" : {0 : "double", 4 : "ldouble"}
 }
-    
+
 def mangl_var(decl):
     if type(decl._ctype) is ComposedType :
         return mangl_userDef(decl)
@@ -32,14 +32,14 @@ def mangl_var(decl):
         mangl += mangl_pointer(decl)
     elif type(decl._ctype._decltype) is ArrayType:
         mangl += mangl_array(decl)
-    if hasattr(decl, "_sign"):
-        if delc._ctype._sign == 1 :
+    if hasattr(decl._ctype, "_sign"):
+        if decl._ctype._sign == 1 and decl._ctype._identifier == "char":
             mangl += "s"
-        else:
-            mangl += "us"
+        if decl._ctype._sign == 2:
+            mangl += "u"
     mangl += mangl_tab[decl._ctype._identifier][decl._ctype._specifier]
     return mangl
-    
+
 
 def mangl_func(decl):
     return mangl_var(decl) + "_" + str(len(decl._ctype._params))
@@ -61,5 +61,4 @@ def typeof_decl(decl):
         return mangl_var(decl)
 
 def mangling(decl, name):
-    return "_kooc" + wichdecl(decl) + "_" + name + typeof_decl(decl)
-    
+    return "_kooc" + wichdecl(decl) + "_" + name + "_" + decl._name + typeof_decl(decl)

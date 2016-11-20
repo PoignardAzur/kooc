@@ -1,0 +1,69 @@
+kooc_declaration =
+[
+    at_import
+    | at_module
+    | at_implem
+    | at_class
+]
+
+at_import =
+[
+    "@import" str
+]
+
+at_module =
+[
+    "@module" id
+    "{"
+        Declaration.declaration*
+    "}"
+]
+
+at_implem =
+[
+    "@implementation" id
+    "{"
+        Declaration.declaration*
+    "}"
+]
+
+at_class =
+[
+    "@implementation" id [ "(" id ")" ]?
+    "{"
+        [ Declaration.declaration | at_member ]*
+    "}"
+]
+
+at_member =
+[
+    "@member"
+    [
+        "{"
+            [ "@virtual"? Declaration.declaration ]*
+        "}"
+        |
+        "@virtual"? Declaration.declaration
+    ]
+]
+
+
+kooc_call =
+[
+    kooc_type?
+    '['
+        [
+            id
+            | Declaration.expression
+        ]
+        [
+            '.' id
+            | id [ ':' kooc_type? Declaration.expression ]*
+        ]
+    ']'
+]
+
+kooc_type =
+[
+    "@!(" Declaration.type ")"
+]
