@@ -6,16 +6,20 @@ def wichdecl(decl):
     else :
         return "_var"
 
-def mangl_pointer(decl):
-    if type(decl._ctype._decltype) is PointerType:
-        return "P"
-    elif type(decl._ctype._decltype) is QualType:
-        return ""
-    else:
-        return ""
+def resolveDeclType(decl):
+    resolvedDeclType = ""
+    dType = decl._ctype
 
-def mangl_array(decl):
-    return "A" + decl._ctype._expr.value
+    while hasattr(dType, "_decltype") and dType._decltype:
+        if type(dType._decltype) == ArrayType:
+            resolvedDeclType += "A"
+            if hasattr(dType._decltype._expr, "value"):
+                resolvedDeclType += dType._decltype._expr.value
+        elif type(dType._decltype) == PointerType:
+            resolvedDeclType += "P"
+        dType = dType._decltype
+
+    return resolvedDeclType
 
 mangl_tab = {
     "char" : {0 : "char"},
@@ -29,10 +33,7 @@ def mangl_var(decl):
     if type(decl._ctype) is ComposedType :
         return mangl_userDef(decl)
     mangl = "_"
-    if type(decl._ctype._decltype) is PointerType:
-        mangl += mangl_pointer(decl)
-    elif type(decl._ctype._decltype) is ArrayType:
-        mangl += mangl_array(decl)
+    mangl += resolveDeclType(decl)
     if hasattr(decl._ctype, "_sign"):
         if decl._ctype._sign == 1 and decl._ctype._identifier == "char":
             mangl += "s"
@@ -49,11 +50,9 @@ def mangl_func(decl):
             params.append(p)
 
     nbParams = len(params)
-
     args = ""
     if nbParams > 0:
         args = "_arg" + "".join([typeof_decl(d) for d in params])
-
     return mangl_var(decl) + "_" + str(nbParams) + args
 
 def mangl_userDef(decl):

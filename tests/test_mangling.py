@@ -175,25 +175,30 @@ class TestMangling(unittest.TestCase):
             "_kooc_var_Foobar_ld_ldouble"
         )
 
-    def test_composed_types(self):
+    def test_pointer_types(self):
 
-        composed_decl_list = c_parser.parse("""
+        pointer_decl_list = c_parser.parse("""
             char *c;
             signed char *Sc;
             unsigned char *Uc;
+            char **ppc;
         """).body
 
         self.assertEqual(
-            mangling(find_decl(composed_decl_list, "c"), "Foobar"),
+            mangling(find_decl(pointer_decl_list, "c"), "Foobar"),
             "_kooc_var_Foobar_c_Pchar"
         )
         self.assertEqual(
-            mangling(find_decl(composed_decl_list, "Sc"), "Foobar"),
+            mangling(find_decl(pointer_decl_list, "Sc"), "Foobar"),
             "_kooc_var_Foobar_Sc_Pschar"
         )
         self.assertEqual(
-            mangling(find_decl(composed_decl_list, "Uc"), "Foobar"),
+            mangling(find_decl(pointer_decl_list, "Uc"), "Foobar"),
             "_kooc_var_Foobar_Uc_Puchar"
+        )
+        self.assertEqual(
+            mangling(find_decl(pointer_decl_list, "ppc"), "Foobar"),
+            "_kooc_var_Foobar_ppc_PPchar"
         )
 
     def test_function_types(self):
@@ -231,3 +236,34 @@ class TestMangling(unittest.TestCase):
             mangling(find_decl(function_decl_list, "six"), "Foobar"),
             "_kooc_func_Foobar_six_Pchar_1_arg_Pchar"
         )
+
+    # ArrayType
+    def test_array_types(self):
+
+        array_decl_list = c_parser.parse("""
+            char one[10];
+            char *two[10];
+            char three[10][10];
+            char four[];
+        """).body
+
+        self.assertEqual(
+            mangling(find_decl(array_decl_list, "one"), "Foobar"),
+            "_kooc_var_Foobar_one_A10char"
+        )
+        self.assertEqual(
+            mangling(find_decl(array_decl_list, "two"), "Foobar"),
+            "_kooc_var_Foobar_two_A10Pchar"
+        )
+        self.assertEqual(
+            mangling(find_decl(array_decl_list, "three"), "Foobar"),
+            "_kooc_var_Foobar_three_A10A10char"
+        )
+        self.assertEqual(
+            mangling(find_decl(array_decl_list, "four"), "Foobar"),
+            "_kooc_var_Foobar_four_Achar"
+        )
+
+    # Struct
+    # Enum
+    # Union
