@@ -1,3 +1,4 @@
+import sys
 from cnorm.parsing.declaration import Declaration
 from cnorm.passes import to_c
 from pyrser import error
@@ -18,6 +19,16 @@ class ErrorClass():
                   self.col = diagnostic.location.col
                   self.line = diagnostic.location.line
                   self.diagnostic = True
+
+      def get_error_message(self):
+            if self.diagnostic is True :
+                  return self.msg
+            else :
+                  new_msg = "In file " + self.filepath + " at line " + self.line + " and column " + self.col + ": \n" + self.msg
+            return new_msg
+
+      def output_Warning(self):
+             print(self.get_error_message(), file=sys.stderr)
 
 def my_get_content(self) -> str:
     f = open(self.filepath, 'r')
