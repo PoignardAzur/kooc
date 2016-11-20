@@ -2,8 +2,14 @@ import sys
 from cnorm.parsing.declaration import Declaration
 from cnorm.passes import to_c
 from pyrser import error
+from .kooc_parser import KoocParser
 
 class Position():
+
+      def __init__ (self, parser: KoocParser):
+
+            self.path = parser._stream.name
+
       def __init__(self, path: str, line: int, col: int):
             
             self.path = path
