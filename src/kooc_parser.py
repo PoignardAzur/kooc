@@ -4,8 +4,9 @@ from cnorm.nodes import RootBlockStmt
 from cnorm.passes import to_c
 
 from pathlib import Path
+from subprocess import call
 
-from .import_handler import ImportHandler
+from .import_handler import ImportHandler, get_complete_path
 from .at_import import AtImport, AtImportParser
 from .at_module import AtModule, AtModuleParser
 from .at_implementation import AtImplementation, AtImplementationParser
@@ -60,12 +61,16 @@ def parse_kooc_file(import_handler, working_file: str, filename: str,
                     silent: bool, imported = False):
     if (not silent) and (not imported):
         print("Parsing file " + filename)
-    if not Path(filename).is_file():
+    complete_path = get_complete_path(working_file, filename)
+    if not Path(complete_path).is_file():
         if not silent:
             msg = "Error: " + str(arg) + " does not exist or isn't a file"
             print(msg, file=sys.stderr)
         return None
     try:
+        #path_begin = ".".join(complete_path.split(".")[:-1])
+        #call(["cpp", complete_path, path_begin + ".kpp"])
+
         node = KoocParser(import_handler, working_file).parse_file(filename)
         return node
     except Diagnostic as diag:
