@@ -3,17 +3,21 @@ from cnorm.parsing.declaration import Declaration
 from cnorm.passes import to_c
 from pyrser import error
 
-class ErrorClass():
-      def __init__(self, msg: str, filepath: str, col: str, line: str):
+class Position():
+      def __init__(self, path: str, line: int, col: int):
+            
+            self.path = path
+            self.line = line
+            self.col = col
 
-                  self.msg = msg
-                  self.filepath = details
-                  self.col = col
-                  self.line = line
-                  self.diagnostic = False
+class ErrorClass():
+      def __init__(self, pos: Position):
+
+            self.msg = msg
+            self.pos = pos
 
       def get_error_message(self):
-            new_msg = "In file " + self.filepath + " at line " + self.line + " and column " + self.col + ": \n" + self.msg
+            new_msg = "In file " + self.pos.path + " at line " + self.pos.line + " and column " + self.pos.col + ": \n" + self.msg
             return new_msg
 
       def output_Warning(self):
