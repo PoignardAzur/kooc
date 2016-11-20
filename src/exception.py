@@ -2,28 +2,15 @@ import sys
 from cnorm.parsing.declaration import Declaration
 from cnorm.passes import to_c
 from pyrser import error
-from .kooc_parser import KoocParser
-
-class Position():
-
-      def __init__ (self, parser: KoocParser):
-
-            self.path = parser._stream.name
-
-      def __init__(self, path: str, line: int, col: int):
-            
-            self.path = path
-            self.line = line
-            self.col = col
 
 class ErrorClass():
-      def __init__(self, pos: Position):
+      def __init__(self, locinfo: error.LocationInfo, msg: str):
 
             self.msg = msg
-            self.pos = pos
+            self.locinfo = locinfo
 
       def get_error_message(self):
-            new_msg = "In file " + self.pos.path + " at line " + self.pos.line + " and column " + self.pos.col + ": \n" + self.msg
+            new_msg = "In file " + self.locinfo.filepath + " at line " + self.locinfo.line + " and column " + self.locinfo.col + ": \n" + self.msg
             return new_msg
 
       def output_Warning(self):
