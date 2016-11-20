@@ -10,5 +10,7 @@
 *.h
 !examples/*.c
 !examples/*.h
+!tests/*_c.c
+!tests/*_c.h
 
 ig-*

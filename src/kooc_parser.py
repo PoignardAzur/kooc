@@ -1,16 +1,31 @@
 from pyrser import meta, grammar
-from pyrser.parsing import node
-from pyrser.hooks.set import set_node
 from cnorm.parsing.declaration import Declaration
+from cnorm.nodes import RootBlockStmt
 from cnorm.passes import to_c
 
-from .at_import import AtImport
-from .at_module import AtModule
-from .at_implementation import AtImplementation
-from .kooc_call import KoocCall
+from pathlib import Path
+from subprocess import call
 
-class KoocParser(grammar.Grammar, Declaration):
-    """Transforms text in KOOC format to a KOOC AST"""
+from .import_handler import ImportHandler, get_complete_path
+from .at_import import AtImport, AtImportParser
+from .at_module import AtModule, AtModuleParser
+from .at_implementation import AtImplementation, AtImplementationParser
+from .kooc_call import KoocCall, convert_all_kooc_calls
+from .object_list import ObjectList
+
+
+class KoocParser(grammar.Grammar,
+                AtImportParser,
+                AtModuleParser,
+                AtImplementationParser
+                ):
+    "Transforms text in KOOC format to a KOOC AST"
+
+    def __init__(self, import_handler, working_file = "-"):
+        grammar.Grammar.__init__(self)
+        Declaration.__init__(self)
+        self.ih = import_handler
+        self.working_file = working_file
 
     entry = "translation_unit"
 
@@ -18,106 +33,61 @@ class KoocParser(grammar.Grammar, Declaration):
         declaration =
         [
             Declaration.declaration
-            | kooc_declaration
-        ]
-
-        kooc_declaration =
-        [
-            __scope__:decl_ast
-
-            [
-                at_import
-                | at_module
-                | at_implem
-            ]
-
-            #add_kooc_decl(current_block, decl_ast)
-        ]
-
-        at_import =
-        [
-            "@import" string:filename
-
-            #create_import(decl_ast,filename)
-        ]
-
-        at_module =
-        [
-            "@module" Base.id:module_name
-
-            "{"
-                __scope__:current_block
-                #new_composed(_, current_block)
-
-                Declaration.declaration*
-            "}"
-
-            #create_module(decl_ast,current_block,module_name)
-        ]
-
-        at_implem =
-        [
-            "@implementation" Base.id:module_name
-
-            "{"
-                __scope__:current_block
-                #new_composed(_, current_block)
-
-                Declaration.declaration*
-            "}"
-
-            #create_implem(decl_ast,current_block,module_name)
-        ]
-/*
-        primary_expression =
-        [
-            // Creates weird errors; should examine Expression source before
-            // uncommenting
-            Expression.primary_expression
             | kooc_call
         ]
 
         kooc_call =
         [
-            kooc_type?
-            '['
-            Base.id:module_name
             [
-                '.' Base.id:var_name
-                | Base.id:func_name [ ':' kooc_type? Expression.expression:expr ]*
-            ]
-            ']'
-        ]
+                AtImportParser.at_import
+                | AtModuleParser.at_module
+                | AtImplementationParser.at_implem
+            ]:decl_ast
 
-        kooc_type =
-        [
-            "@!(" Base.id:typename ")"
+            #add_kooc_decl(current_block, decl_ast)
         ]
-*/
     """
 
 @meta.hook(KoocParser)
 def add_kooc_decl(self, current_block, ast):
-    current_block.ref.body.append(ast.contents)
+    current_block.ref.body.append(ast)
     if hasattr(ast, "types"):
         for name, type_ast in ast.types.items():
             current_block.ref.types[name] = type_ast
     return True
 
-@meta.hook(KoocParser)
-def create_import(self, ast, filename):
-    ast.contents = AtImport(self.value(filename).strip('"'), KoocParser())
-    ast.types = ast.contents.ast.types
-    return True
 
-@meta.hook(KoocParser)
-def create_module(self, ast, contents, module_name):
-    ast.contents = AtModule(self.value(module_name), contents.ref.body)
-    return True
+def parse_kooc_file(import_handler, working_file: str, filename: str,
+                    silent: bool, imported = False):
+    if (not silent) and (not imported):
+        print("Parsing file " + filename)
+    complete_path = get_complete_path(working_file, filename)
+    if not Path(complete_path).is_file():
+        if not silent:
+            msg = "Error: " + str(arg) + " does not exist or isn't a file"
+            print(msg, file=sys.stderr)
+        return None
+    try:
+        #path_begin = ".".join(complete_path.split(".")[:-1])
+        #call(["cpp", complete_path, path_begin + ".kpp"])
 
-@meta.hook(KoocParser)
-def create_implem(self, ast, contents, module_name):
-    ast.contents = AtImplementation(self.value(module_name), contents.ref.body)
-    return True
+        node = KoocParser(import_handler, working_file).parse_file(filename)
+        return node
+    except Diagnostic as diag:
+        if not silent:
+            sys.stderr.write("Parsing error: " + str(diag) + "\n")
+        return None
 
-defaultKoocParser = KoocParser()
+
+def convert_node(node, object_list: ObjectList):
+    if hasattr(node, "get_c_ast"):
+        return node.get_c_ast(object_list)
+    else:
+        return [node]
+
+def convert_ast(ast, object_list: ObjectList):
+    decl_list = []
+    for decl in ast.body:
+        decl_list.extend(convert_node(decl, object_list))
+    convert_all_kooc_calls(decl_list, object_list)
+    return RootBlockStmt(decl_list)
