@@ -199,29 +199,35 @@ class TestMangling(unittest.TestCase):
     def test_function_types(self):
 
         function_decl_list = c_parser.parse("""
-            void one();
-            void two(void);
-            char *four();
-            void five(char *);
-        """)
+            char one();
+            void two();
+            void three(void);
+            char four(char c);
+            char *five(char *str);
+            char *six(void, char *str);
+        """).body
 
         self.assertEqual(
             mangling(find_decl(function_decl_list, "one"), "Foobar"),
-            "_kooc_var_Foobar_one__"
+            "_kooc_func_Foobar_one_char_0"
         )
-        # self.assertEqual(
-        #     mangling(find_decl(function, "two"), "Foobar"),
-        #     "_kooc_var_Foobar_Uc_Puchar"
-        # )
-        # self.assertEqual(
-        #     mangling(find_decl(function, "three"), "Foobar"),
-        #     "_kooc_var_Foobar_Uc_Puchar"
-        # )
-        # self.assertEqual(
-        #     mangling(find_decl(function, "four"), "Foobar"),
-        #     "_kooc_var_Foobar_Uc_Puchar"
-        # )
-        # self.assertEqual(
-        #     mangling(find_decl(function, "five"), "Foobar"),
-        #     "_kooc_var_Foobar_Uc_Puchar"
-        # )
+        self.assertEqual(
+            mangling(find_decl(function_decl_list, "two"), "Foobar"),
+            "_kooc_func_Foobar_two_void_0"
+        )
+        self.assertEqual(
+            mangling(find_decl(function_decl_list, "three"), "Foobar"),
+            "_kooc_func_Foobar_three_void_0"
+        )
+        self.assertEqual(
+            mangling(find_decl(function_decl_list, "four"), "Foobar"),
+            "_kooc_func_Foobar_four_char_1_arg_char"
+        )
+        self.assertEqual(
+            mangling(find_decl(function_decl_list, "five"), "Foobar"),
+            "_kooc_func_Foobar_five_Pchar_1_arg_Pchar"
+        )
+        self.assertEqual(
+            mangling(find_decl(function_decl_list, "six"), "Foobar"),
+            "_kooc_func_Foobar_six_Pchar_1_arg_Pchar"
+        )

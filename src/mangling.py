@@ -21,7 +21,8 @@ mangl_tab = {
     "char" : {0 : "char"},
     "int" : {0 : "int", 4 : "long", 5 : "llong", 6 : "short"},
     "float" : {0 : "float"},
-    "double" : {0 : "double", 4 : "ldouble"}
+    "double" : {0 : "double", 4 : "ldouble"},
+    "void" : {0 : "void"}
 }
 
 def mangl_var(decl):
@@ -42,7 +43,18 @@ def mangl_var(decl):
 
 
 def mangl_func(decl):
-    return mangl_var(decl) + "_" + str(len(decl._ctype._params))
+    params = []
+    for p in decl._ctype._params:
+        if typeof_decl(p) != "_void":
+            params.append(p)
+
+    nbParams = len(params)
+
+    args = ""
+    if nbParams > 0:
+        args = "_arg" + "".join([typeof_decl(d) for d in params])
+
+    return mangl_var(decl) + "_" + str(nbParams) + args
 
 def mangl_userDef(decl):
     if hasattr(decl._ctype, "enums"):
@@ -53,9 +65,7 @@ def mangl_userDef(decl):
         return "_U" + decl._ctype._identifier
 
 def typeof_decl(decl):
-    if type(decl._ctype) is PrimaryType :
-        return mangl_var(decl)
-    elif type(decl._ctype) is FuncType :
+    if type(decl._ctype) is FuncType :
         return mangl_func(decl)
     else :
         return mangl_var(decl)
