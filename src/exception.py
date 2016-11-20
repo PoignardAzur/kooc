@@ -3,7 +3,7 @@ from cnorm.parsing.declaration import Declaration
 from cnorm.passes import to_c
 from pyrser import error
 
-class KoocException():
+class KoocException(Exception):
       def __init__(self, locinfo: error.LocationInfo, msg: str):
 
             self.msg = msg
