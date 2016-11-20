@@ -1,5 +1,5 @@
 from src.import_handler import ImportHandler, ImportHandlerError
-from src.import_handler import _get_complete_path
+from src.import_handler import get_complete_path
 from src.kooc_parser import KoocParser
 from src.at_module import AtModule
 from src.at_import import AtImport, KoocImportError
@@ -19,21 +19,21 @@ class TestImportHandler(unittest.TestCase):
     def test_path_resolving_empty_wd(self):
         "Tests that relative paths are resolved with no working directory"
         self.assertEqual(
-            _get_complete_path("", "tests/tests_at_import.kh"),
+            get_complete_path("", "tests/tests_at_import.kh"),
             realpath("tests/tests_at_import.kh")
         )
 
     def test_path_resolving_with_wf(self):
         "Tests that relative paths are resolved with a working file"
         self.assertEqual(
-            _get_complete_path("tests/tests_all.kc", "tests_at_import.kh"),
+            get_complete_path("tests/tests_all.kc", "tests_at_import.kh"),
             realpath("tests/tests_at_import.kh")
         )
 
     def test_path_resolving_c_files(self):
         "Tests that relative paths are resolved with a .h file"
         self.assertEqual(
-            _get_complete_path("tests/tests_all.kc", "tests_at_import_c.h"),
+            get_complete_path("tests/tests_all.kc", "tests_at_import_c.h"),
             realpath("tests/tests_at_import_c.h")
         )
 
@@ -41,8 +41,8 @@ class TestImportHandler(unittest.TestCase):
         "Tests whether a wrong path raises an exception"
         # It probably doesn't? This isn't exactly an unit test
 
-        _get_complete_path("", "file_that_doesnt_exist.kh")
-        _get_complete_path("file_that", "doesnt_exist.kh")
+        get_complete_path("", "file_that_doesnt_exist.kh")
+        get_complete_path("file_that", "doesnt_exist.kh")
 
     #TODO test _get_dir
 

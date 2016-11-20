@@ -10,7 +10,7 @@ from .object_list import ObjectList
 def _get_dir(path: str):
     return "/".join(path.split("/")[:-1])
 
-def _get_complete_path(working_file: str, file_path: str):
+def get_complete_path(working_file: str, file_path: str):
     "Resolves relative paths"
 
     if working_file == "" or working_file == "-":
@@ -40,12 +40,13 @@ class ImportHandler:
 
         if not re.search(".*\\.k?h", file_path):
             raise ImportHandlerError(file_path)
-        complete_path = _get_complete_path(working_file, file_path)
-        if not Path(complete_path).is_file():
-            raise ImportHandlerError("CAN'T FIND " + complete_path)
+        complete_path = get_complete_path(working_file, file_path)
         if (complete_path not in self._loaded_asts):
             silent = self._silent
             ast = parse_kooc_file(self, working_file, file_path, silent, True)
+            if not ast:
+                raise ImportHandlerError
+
             self._loaded_asts[complete_path] = ast
 
         return self._loaded_asts[complete_path]
@@ -58,7 +59,7 @@ class ImportHandler:
 
         from src.kooc_parser import convert_ast
 
-        complete_path = _get_complete_path(working_file, file_path)
+        complete_path = get_complete_path(working_file, file_path)
         if (complete_path in self._converted_asts):
             return False
         self._converted_asts[complete_path] = True
