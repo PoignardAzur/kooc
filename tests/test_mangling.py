@@ -237,7 +237,6 @@ class TestMangling(unittest.TestCase):
             "_kooc_func_Foobar_six_Pchar_1_arg_Pchar"
         )
 
-    # ArrayType
     def test_array_types(self):
 
         array_decl_list = c_parser.parse("""
@@ -261,9 +260,53 @@ class TestMangling(unittest.TestCase):
         )
         self.assertEqual(
             mangling(find_decl(array_decl_list, "four"), "Foobar"),
-            "_kooc_var_Foobar_four_Achar"
+            "_kooc_var_Foobar_four_Pchar"
         )
 
-    # Struct
-    # Enum
-    # Union
+    def test_struct_types(self):
+
+        struct_decl_list = c_parser.parse("""
+            struct Test one;
+            struct Test *two;
+        """).body
+
+        self.assertEqual(
+            mangling(find_decl(struct_decl_list, "one"), "Foobar"),
+            "_kooc_var_Foobar_one_STest"
+        )
+        self.assertEqual(
+            mangling(find_decl(struct_decl_list, "two"), "Foobar"),
+            "_kooc_var_Foobar_two_PSTest"
+        )
+
+    def test_enum_types(self):
+
+        enum_decl_list = c_parser.parse("""
+            enum Test one;
+            enum Test *two;
+        """).body
+
+        self.assertEqual(
+            mangling(find_decl(enum_decl_list, "one"), "Foobar"),
+            "_kooc_var_Foobar_one_ETest"
+        )
+        self.assertEqual(
+            mangling(find_decl(enum_decl_list, "two"), "Foobar"),
+            "_kooc_var_Foobar_two_PETest"
+        )
+
+    def test_union_types(self):
+
+        union_decl_list = c_parser.parse("""
+            union Test one;
+            union Test *two;
+        """).body
+
+        self.assertEqual(
+            mangling(find_decl(union_decl_list, "one"), "Foobar"),
+            "_kooc_var_Foobar_one_UTest"
+        )
+        self.assertEqual(
+            mangling(find_decl(union_decl_list, "two"), "Foobar"),
+            "_kooc_var_Foobar_two_PUTest"
+        )

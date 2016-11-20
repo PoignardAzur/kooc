@@ -7,14 +7,16 @@ def wichdecl(decl):
         return "_var"
 
 def resolveDeclType(decl):
-    resolvedDeclType = ""
+    resolvedDeclType = "_"
     dType = decl._ctype
 
     while hasattr(dType, "_decltype") and dType._decltype:
         if type(dType._decltype) == ArrayType:
-            resolvedDeclType += "A"
             if hasattr(dType._decltype._expr, "value"):
+                resolvedDeclType += "A"
                 resolvedDeclType += dType._decltype._expr.value
+            else:
+                resolvedDeclType += "P"
         elif type(dType._decltype) == PointerType:
             resolvedDeclType += "P"
         dType = dType._decltype
@@ -30,10 +32,9 @@ mangl_tab = {
 }
 
 def mangl_var(decl):
+    mangl = resolveDeclType(decl)
     if type(decl._ctype) is ComposedType :
-        return mangl_userDef(decl)
-    mangl = "_"
-    mangl += resolveDeclType(decl)
+        return mangl + mangl_userDef(decl)
     if hasattr(decl._ctype, "_sign"):
         if decl._ctype._sign == 1 and decl._ctype._identifier == "char":
             mangl += "s"
@@ -48,7 +49,6 @@ def mangl_func(decl):
     for p in decl._ctype._params:
         if typeof_decl(p) != "_void":
             params.append(p)
-
     nbParams = len(params)
     args = ""
     if nbParams > 0:
@@ -56,12 +56,12 @@ def mangl_func(decl):
     return mangl_var(decl) + "_" + str(nbParams) + args
 
 def mangl_userDef(decl):
-    if hasattr(decl._ctype, "enums"):
-        return "_E" + decl._ctype._identifier
     if decl._ctype._specifier == 1:
-        return "_S" + decl._ctype._identifier
-    else:
-        return "_U" + decl._ctype._identifier
+        return "S" + decl._ctype._identifier
+    elif decl._ctype._specifier == 2:
+        return "U" + decl._ctype._identifier
+    elif decl._ctype._specifier == 3:
+        return "E" + decl._ctype._identifier
 
 def typeof_decl(decl):
     if type(decl._ctype) is FuncType :
