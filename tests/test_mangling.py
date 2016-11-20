@@ -197,4 +197,31 @@ class TestMangling(unittest.TestCase):
         )
 
     def test_function_types(self):
-        pass
+
+        function_decl_list = c_parser.parse("""
+            void one();
+            void two(void);
+            char *four();
+            void five(char *);
+        """)
+
+        self.assertEqual(
+            mangling(find_decl(function_decl_list, "one"), "Foobar"),
+            "_kooc_var_Foobar_one__"
+        )
+        # self.assertEqual(
+        #     mangling(find_decl(function, "two"), "Foobar"),
+        #     "_kooc_var_Foobar_Uc_Puchar"
+        # )
+        # self.assertEqual(
+        #     mangling(find_decl(function, "three"), "Foobar"),
+        #     "_kooc_var_Foobar_Uc_Puchar"
+        # )
+        # self.assertEqual(
+        #     mangling(find_decl(function, "four"), "Foobar"),
+        #     "_kooc_var_Foobar_Uc_Puchar"
+        # )
+        # self.assertEqual(
+        #     mangling(find_decl(function, "five"), "Foobar"),
+        #     "_kooc_var_Foobar_Uc_Puchar"
+        # )
