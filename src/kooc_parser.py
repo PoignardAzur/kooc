@@ -1,12 +1,16 @@
 from pyrser import meta, grammar
 from cnorm.parsing.declaration import Declaration
+from cnorm.nodes import RootBlockStmt
 from cnorm.passes import to_c
+
+from pathlib import Path
 
 from .import_handler import ImportHandler
 from .at_import import AtImport, AtImportParser
 from .at_module import AtModule, AtModuleParser
 from .at_implementation import AtImplementation, AtImplementationParser
-from .kooc_call import KoocCall
+from .kooc_call import KoocCall, convert_all_kooc_calls
+from .object_list import ObjectList
 
 
 class KoocParser(grammar.Grammar,
@@ -50,5 +54,38 @@ def add_kooc_decl(self, current_block, ast):
         for name, type_ast in ast.types.items():
             current_block.ref.types[name] = type_ast
     return True
+
+
+def parse_kooc_file(import_handler, working_file: str, filename: str,
+                    silent: bool, imported = False):
+    if (not silent) and (not imported):
+        print("Parsing file " + filename)
+    if not Path(filename).is_file():
+        if not silent:
+            msg = "Error: " + str(arg) + " does not exist or isn't a file"
+            print(msg, file=sys.stderr)
+        return None
+    try:
+        node = KoocParser(import_handler, working_file).parse_file(filename)
+        return node
+    except Diagnostic as diag:
+        if not silent:
+            sys.stderr.write("Parsing error: " + str(diag) + "\n")
+        return None
+
+
+def convert_node(node, object_list: ObjectList):
+    if hasattr(node, "get_c_ast"):
+        return node.get_c_ast(object_list)
+    else:
+        return [node]
+
+def convert_ast(ast, object_list: ObjectList):
+    decl_list = []
+    for decl in ast.body:
+        decl_list.extend(convert_node(decl, object_list))
+    convert_all_kooc_calls(decl_list, object_list)
+    return RootBlockStmt(decl_list)
+
 
 defaultKoocParser = KoocParser(ImportHandler())
