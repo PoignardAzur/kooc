@@ -53,12 +53,3 @@ def my_get_content(self) -> str:
         i=indent
     )
     return txt
-
-error.LocationInfo.get_content = my_get_content
-try:
-    cparse = Declaration()
-    ast = cparse.parse_file("test.c")
-    print(ast.to_c())
-except error.Diagnostic as e:
-    print(e)
-    print(e.logs[0].get_content(True, True))
