@@ -28,14 +28,15 @@ class ImportHandlerError(Exception):
 
 class ImportHandler:
 
-    def __init__(self):
+    def __init__(self, silent):
         self._loaded_asts = {}
         self._converted_asts = {}
+        self._silent = silent
 
     def parse_file(self, working_file: str, file_path: str):
         "Parses given file, puts the parsed AST in a cache and returns it"
 
-        from src.kooc_parser import KoocParser
+        from src.kooc_parser import parse_kooc_file
 
         if not re.search(".*\\.k?h", file_path):
             raise ImportHandlerError(file_path)
@@ -43,10 +44,9 @@ class ImportHandler:
         if not Path(complete_path).is_file():
             raise ImportHandlerError("CAN'T FIND " + complete_path)
         if (complete_path not in self._loaded_asts):
-            kooc_parser = KoocParser(self, _get_dir(complete_path))
-            ast = kooc_parser.parse_file(complete_path)
+            silent = self._silent
+            ast = parse_kooc_file(self, working_file, file_path, silent, True)
             self._loaded_asts[complete_path] = ast
-        #TODO replace with standardized parsing
 
         return self._loaded_asts[complete_path]
 
@@ -56,14 +56,13 @@ class ImportHandler:
 
         Returns True if the file hasn't been 'loaded' yet, False otherwise"""
 
+        from src.kooc_parser import convert_ast
+
         complete_path = _get_complete_path(working_file, file_path)
         if (complete_path in self._converted_asts):
             return False
         self._converted_asts[complete_path] = True
 
-        for decl in self._loaded_asts[complete_path].body:
-            if hasattr(decl, "get_c_ast"):
-                decl.get_c_ast(object_list)
-        #TODO replace with standardized conversion
+        convert_ast(self._loaded_asts[complete_path], object_list)
 
         return True

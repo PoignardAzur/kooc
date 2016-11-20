@@ -11,7 +11,7 @@ from os.path import realpath
 
 import unittest
 
-ih = ImportHandler()
+ih = ImportHandler(silent = True)
 kooc_parser = KoocParser(ih)
 c_parser = Declaration()
 
