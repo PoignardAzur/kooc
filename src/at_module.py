@@ -1,8 +1,39 @@
 import copy
-from cnorm.nodes import FuncType
+
+from pyrser import meta, grammar
 from pyrser.parsing.node import Node
+from cnorm.nodes import FuncType
+from cnorm.parsing.declaration import Declaration
+
 from .mangling import mangling
 from .object_list import ObjectList
+
+
+class AtModuleParser(grammar.Grammar, Declaration):
+    "Creates a AtModule AST from text"
+
+    entry = "at_module"
+
+    grammar = """
+        at_module =
+        [
+            "@module" Base.id:module_name
+            "{"
+                __scope__:current_block
+                #new_composed(_, current_block)
+
+                Declaration.declaration*
+            "}"
+
+            #create_module(_,module_name)
+        ]
+    """
+
+@meta.hook(AtModuleParser)
+def create_module(self, ast, module_name):
+    module_contents = ast.body
+    ast.set(AtModule(self.value(module_name), module_contents))
+    return True
 
 
 class AtModuleErrorMultiModule(Exception):
