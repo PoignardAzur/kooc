@@ -7,6 +7,8 @@ from src.object_list import ObjectList
 
 from os.path import realpath
 
+from pyrser import error
+
 import unittest
 
 kooc_parser = KoocParser(None)
@@ -97,6 +99,6 @@ class TestImportHandler(unittest.TestCase):
         objs = ObjectList()
         ih.parse_file("", "tests/test_at_import.kh")
         self.assertTrue(ih.load_objects_in(objs, "", "tests/test_at_import.kh"))
-        self.assertEqual(objs.list, [ AtModule("foobar", []) ])
+        self.assertEqual(objs.list, [ AtModule("foobar", [], error.LocationInfo.from_stream(kooc_parser._stream)) ])
         self.assertFalse(ih.load_objects_in(objs,"", "tests/test_at_import.kh"))
-        self.assertEqual(objs.list, [ AtModule("foobar", []) ])
+        self.assertEqual(objs.list, [ AtModule("foobar", [], error.LocationInfo.from_stream(kooc_parser._stream)) ])

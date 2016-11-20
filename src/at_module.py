@@ -2,13 +2,14 @@ import copy
 
 from pyrser import meta, grammar
 from pyrser.parsing.node import Node
+from pyrser import error
 from cnorm.nodes import FuncType
 from cnorm.nodes import Storages, Qualifiers, Specifiers, Signs
 from cnorm.parsing.declaration import Declaration
 
 from .mangling import mangling
 from .object_list import ObjectList
-
+from .exception import KoocException
 
 class AtModuleParser(grammar.Grammar, Declaration):
     "Creates a AtModule AST from text"
@@ -33,29 +34,27 @@ class AtModuleParser(grammar.Grammar, Declaration):
 @meta.hook(AtModuleParser)
 def create_module(self, ast, module_name):
     module_contents = ast.body
-    ast.set(AtModule(self.value(module_name), module_contents))
+    ast.set(AtModule(self.value(module_name), module_contents, error.LocationInfo.from_stream(self._stream)))
     return True
 
 
-class AtModuleError(Exception):
-    pass
-
 class AtModule(Node):
 
-    def __init__(self, name: str, fields: list):
+    def __init__(self, name: str, fields: list, locinfo: error.LocationInfo):
         self.name = name
         self.fields = fields
+        self.locinfo = locinfo
 
     def convert_node(self, node):
         storage = node._ctype._storage
         if storage == Storages.TYPEDEF:
-            raise AtModuleError
+            raise KoocException(self.locinfo, "An error occured")
         if storage == Storages.STATIC:
-            raise AtModuleError
+            raise KoocException(self.locinfo, "An error occured")
         if storage == Storages.EXTERN:
-            raise AtModuleError
+            raise KoocException(self.locinfo, "An error occured")
         if hasattr(node, "body") and storage != Storages.INLINE:
-            raise AtModuleError
+            raise KoocException(self.locinfo, "An error occured")
         if hasattr(node, "body"):
             node._ctype._storage = Storages.STATIC
         elif type(node._ctype) is not FuncType:
@@ -65,7 +64,7 @@ class AtModule(Node):
     def get_c_ast(self, module_list: ObjectList):
 
         if module_list.find_object(self.name):
-            raise AtModuleError()
+            raise KoocException(self.locinfo, "Modules and/or variables cannot share the same name")
         module_list.add_module(self)
 
         c_fields = copy.deepcopy(self.fields)
@@ -73,6 +72,6 @@ class AtModule(Node):
         for field in c_fields:
             self.convert_node(field)
             if field._name in field_names:
-                raise AtModuleError
+                raise KoocException(self.locinfo, "Variable/function duplicate")
             field_names.append(field._name)
         return c_fields

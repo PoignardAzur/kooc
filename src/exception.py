@@ -4,7 +4,7 @@ from cnorm.passes import to_c
 from pyrser import error
 
 class KoocException(Exception):
-      def __init__(self, locinfo: error.LocationInfo, msg: str):
+      def __init__(self, locinfo: error.LocationInfo = None, msg: str = "An error has occured"):
 
             self.msg = msg
             self.locinfo = locinfo
