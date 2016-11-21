@@ -34,13 +34,13 @@ class AtImplementationParser(grammar.Grammar, Declaration):
 @meta.hook(AtImplementationParser)
 def create_implem(self, ast, module_name):
     module_contents = ast.body
-    ast.set(AtImplementation(self.value(module_name), module_contents))
+    ast.set(AtImplementation(self.value(module_name), module_contents, error.LocationInfo.from_stream(self._stream)))
     return True
 
 
 class AtImplementation(Node):
 
-    def __init__(self, name: str, fields: list):
+    def __init__(self, name: str, fields: list, locinfo: error.LocationInfo):
         self.name = name
         self.fields = fields
 

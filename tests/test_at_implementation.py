@@ -25,12 +25,12 @@ class TestAtImplement(unittest.TestCase):
 
     def test_parsing_atimplement_empty(self):
         parsed_imp = kooc_parser.parse("@implementation foo {}").body[0]
-        control_imp = AtImplementation("foo", [])
+        control_imp = AtImplementation("foo", [], error.LocationInfo.from_stream(kooc_parser._stream))
 
         self.assertEqual(parsed_imp, control_imp)
 
     def test_transform_atimplement_basic(self):
-        imp = AtImplementation("foo", [])
+        imp = AtImplementation("foo", [], error.LocationInfo.from_stream(kooc_parser._stream))
         parsed_module = par.parse("int x;").body[0]
         parsed_module._name = mangling(parsed_module, "foo")
 
