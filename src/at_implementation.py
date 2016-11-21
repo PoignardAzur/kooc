@@ -2,6 +2,9 @@ import copy
 
 from pyrser import meta, grammar
 from pyrser.parsing.node import Node
+from pyrser import error
+from cnorm.nodes import FuncType
+from cnorm.nodes import Storages, Qualifiers, Specifiers, Signs
 from cnorm.parsing.declaration import Declaration
 
 from .mangling import mangling
@@ -41,6 +44,22 @@ class AtImplementation(Node):
         self.name = name
         self.fields = fields
 
+    def convert_node(self, node, module_name):
+        node._name = mangling(node, module_name)
+
     def get_c_ast(self, module_list: ObjectList) :
-        # TODO
-        return []
+        module = module_list.find_object(self.name)
+        if module is None:
+            return self.fields
+        c_fields = copy.deepcopy(self.fields)
+        field_names = []
+        for field in module.fields:
+            if type(field._ctype) is not FuncType:
+                c_fields.append(field)
+        for field in c_fields:
+            self.convert_node(field, self.name)
+            field_names.append(field._name)
+        return c_fields
+
+# CAMILLE, J'AI FAIT TON BOULOT
+# SOIS HEUREUX PUTAIN
