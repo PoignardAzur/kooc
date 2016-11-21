@@ -175,7 +175,138 @@ class TestMangling(unittest.TestCase):
             "_kooc_var_Foobar_ld_ldouble"
         )
 
-    def test_composed_types(self):
-        pass
+    def test_pointer_types(self):
+
+        pointer_decl_list = c_parser.parse("""
+            char *c;
+            signed char *Sc;
+            unsigned char *Uc;
+            char **ppc;
+        """).body
+
+        self.assertEqual(
+            mangling(find_decl(pointer_decl_list, "c"), "Foobar"),
+            "_kooc_var_Foobar_c_Pchar"
+        )
+        self.assertEqual(
+            mangling(find_decl(pointer_decl_list, "Sc"), "Foobar"),
+            "_kooc_var_Foobar_Sc_Pschar"
+        )
+        self.assertEqual(
+            mangling(find_decl(pointer_decl_list, "Uc"), "Foobar"),
+            "_kooc_var_Foobar_Uc_Puchar"
+        )
+        self.assertEqual(
+            mangling(find_decl(pointer_decl_list, "ppc"), "Foobar"),
+            "_kooc_var_Foobar_ppc_PPchar"
+        )
+
     def test_function_types(self):
-        pass
+
+        function_decl_list = c_parser.parse("""
+            char one();
+            void two();
+            void three(void);
+            char four(char c);
+            char *five(char *str);
+            char *six(void, char *str);
+        """).body
+
+        self.assertEqual(
+            mangling(find_decl(function_decl_list, "one"), "Foobar"),
+            "_kooc_func_Foobar_one_char_0"
+        )
+        self.assertEqual(
+            mangling(find_decl(function_decl_list, "two"), "Foobar"),
+            "_kooc_func_Foobar_two_void_0"
+        )
+        self.assertEqual(
+            mangling(find_decl(function_decl_list, "three"), "Foobar"),
+            "_kooc_func_Foobar_three_void_0"
+        )
+        self.assertEqual(
+            mangling(find_decl(function_decl_list, "four"), "Foobar"),
+            "_kooc_func_Foobar_four_char_1_arg_char"
+        )
+        self.assertEqual(
+            mangling(find_decl(function_decl_list, "five"), "Foobar"),
+            "_kooc_func_Foobar_five_Pchar_1_arg_Pchar"
+        )
+        self.assertEqual(
+            mangling(find_decl(function_decl_list, "six"), "Foobar"),
+            "_kooc_func_Foobar_six_Pchar_1_arg_Pchar"
+        )
+
+    def test_array_types(self):
+
+        array_decl_list = c_parser.parse("""
+            char one[10];
+            char *two[10];
+            char three[10][10];
+            char four[];
+        """).body
+
+        self.assertEqual(
+            mangling(find_decl(array_decl_list, "one"), "Foobar"),
+            "_kooc_var_Foobar_one_A10char"
+        )
+        self.assertEqual(
+            mangling(find_decl(array_decl_list, "two"), "Foobar"),
+            "_kooc_var_Foobar_two_A10Pchar"
+        )
+        self.assertEqual(
+            mangling(find_decl(array_decl_list, "three"), "Foobar"),
+            "_kooc_var_Foobar_three_A10A10char"
+        )
+        self.assertEqual(
+            mangling(find_decl(array_decl_list, "four"), "Foobar"),
+            "_kooc_var_Foobar_four_Pchar"
+        )
+
+    def test_struct_types(self):
+
+        struct_decl_list = c_parser.parse("""
+            struct Test one;
+            struct Test *two;
+        """).body
+
+        self.assertEqual(
+            mangling(find_decl(struct_decl_list, "one"), "Foobar"),
+            "_kooc_var_Foobar_one_STest"
+        )
+        self.assertEqual(
+            mangling(find_decl(struct_decl_list, "two"), "Foobar"),
+            "_kooc_var_Foobar_two_PSTest"
+        )
+
+    def test_enum_types(self):
+
+        enum_decl_list = c_parser.parse("""
+            enum Test one;
+            enum Test *two;
+        """).body
+
+        self.assertEqual(
+            mangling(find_decl(enum_decl_list, "one"), "Foobar"),
+            "_kooc_var_Foobar_one_ETest"
+        )
+        self.assertEqual(
+            mangling(find_decl(enum_decl_list, "two"), "Foobar"),
+            "_kooc_var_Foobar_two_PETest"
+        )
+
+    def test_union_types(self):
+
+        union_decl_list = c_parser.parse("""
+            union Test one;
+            union Test *two;
+        """).body
+
+        self.assertEqual(
+            mangling(find_decl(union_decl_list, "one"), "Foobar"),
+            "_kooc_var_Foobar_one_UTest"
+        )
+        self.assertEqual(
+            mangling(find_decl(union_decl_list, "two"), "Foobar"),
+            "_kooc_var_Foobar_two_PUTest"
+        )

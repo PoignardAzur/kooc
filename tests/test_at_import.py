@@ -5,6 +5,7 @@ from src.kooc_parser import KoocParser
 from src.object_list import ObjectList
 
 from pyrser.error import Diagnostic
+from pyrser import error
 from cnorm.parsing.declaration import Declaration
 
 from os.path import realpath
@@ -54,7 +55,7 @@ class TestAtImport(unittest.TestCase):
         for i in range(0, 4):
             self.assertEqual(c_ast[i].value, control_ast.body[i].value)
 
-        self.assertEqual(objs.list, [ AtModule("foobar", []) ])
+        self.assertEqual(objs.list, [ AtModule("foobar", [], error.LocationInfo.from_stream(kooc_parser._stream)) ])
 
 
     def test_remember_c_types(self):

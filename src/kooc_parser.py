@@ -137,6 +137,8 @@ def parse_kooc_file(import_handler, working_file: str, filename: str,
     except Diagnostic as diag:
         if not silent:
             sys.stderr.write("Parsing error: " + str(diag) + "\n")
+        if imported:
+            raise Diagnostic()
         return None
 
 
@@ -148,7 +150,11 @@ def convert_node(node, object_list: ObjectList):
 
 def convert_ast(ast, object_list: ObjectList):
     decl_list = []
-    for decl in ast.body:
-        decl_list.extend(convert_node(decl, object_list))
-    convert_all_kooc_calls(decl_list, object_list)
+
+    try:
+        for decl in ast.body:
+            decl_list.extend(convert_node(decl, object_list))
+        convert_all_kooc_calls(decl_list, object_list)
+    except KoocException as exc:
+        print(exc.get_error_message())
     return RootBlockStmt(decl_list)
