@@ -9,7 +9,7 @@ from cnorm.parsing.declaration import Declaration
 
 from .mangling import mangling
 from .object_list import ObjectList
-
+from .exception import KoocException
 
 class AtImplementationParser(grammar.Grammar, Declaration):
     "Creates a KoocModule AST from text"
@@ -43,6 +43,7 @@ class AtImplementation(Node):
     def __init__(self, name: str, fields: list, locinfo: error.LocationInfo):
         self.name = name
         self.fields = fields
+        self.locinfo = locinfo
 
     def convert_node(self, node, module_name):
         node._name = mangling(node, module_name)
@@ -50,7 +51,13 @@ class AtImplementation(Node):
     def get_c_ast(self, module_list: ObjectList) :
         module = module_list.find_object(self.name)
         if module is None:
-            return self.fields
+            raise KoocException(self.locinfo, "No corresponding module")
+        for field in self.fields:
+            if type(field._ctype) is not FuncType:
+                print ("Variable declared in @implementation")
+                raise KoocException(self.locinfo, "Variable declared in @implementation")
+#            else:
+ #               if 
         c_fields = copy.deepcopy(self.fields)
         field_names = []
         for field in module.fields:
