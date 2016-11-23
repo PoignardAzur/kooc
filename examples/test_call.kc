@@ -1,0 +1,8 @@
+@module Algo
+{
+   int     d = 0;
+}
+int	main()
+{
+	[Algo.d];
+}

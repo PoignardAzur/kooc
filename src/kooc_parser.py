@@ -33,18 +33,44 @@ class KoocParser(grammar.Grammar,
         declaration =
         [
             Declaration.declaration
-            | kooc_call
+            |
+            [
+                [
+                    AtImportParser.at_import
+                    | AtModuleParser.at_module
+                    | AtImplementationParser.at_implem
+                ]:decl_ast
+
+                #add_kooc_decl(current_block, decl_ast)
+            ]
         ]
 
-        kooc_call =
+        primary_expression =
         [
-            [
-                AtImportParser.at_import
-                | AtModuleParser.at_module
-                | AtImplementationParser.at_implem
-            ]:decl_ast
+            // Creates weird errors; should examine Expression source before
+            // uncommenting
+            Declaration.primary_expression:>_
+            | kooc_call:>_
+        ]
 
-            #add_kooc_decl(current_block, decl_ast)
+       kooc_call =
+        [
+            [kooc_type:type #set_type(_, type)]?
+            "["
+            Base.id:module_name
+            [
+                ["." Base.id:var_name #create_call_var(_, module_name, var_name)]
+                |
+                [ Base.id:func_name #create_call_func(_, module_name, func_name)
+                [ ":" kooc_type? Expression.expression:expr #create_call_func_addExpr(_, expr)]*
+                #create_call_func_push(_)]
+            ]
+            "]"
+        ]
+
+        kooc_type =
+        [
+            "@!(" Base.id ")"
         ]
     """
 
@@ -54,6 +80,41 @@ def add_kooc_decl(self, current_block, ast):
     if hasattr(ast, "types"):
         for name, type_ast in ast.types.items():
             current_block.ref.types[name] = type_ast
+    return True
+
+
+@meta.hook(KoocParser)
+def set_type(self, ast, typee):
+    ast.typee = self.value(typee)[3:]
+    ast.typee = ast.typee[:-1]
+    return True
+
+@meta.hook(KoocParser)
+def create_call_var(self, ast, module_name, var_name):
+    typeExpr = ""
+    if hasattr(ast, "typee"):
+        typeExpr = ast.typee
+    ast.set(KoocCall(self.value(module_name), self.value(var_name), typeExpr, False, None))
+    return True
+
+@meta.hook(KoocParser)
+def create_call_func(self, ast, module_name, func_name):
+    ast.typeExpr = ""
+    if hasattr(ast, "typee"):
+        ast.typeExpr = ast.typee
+    ast.module = self.value(module_name)
+    ast.func = self.value(func_name)
+    ast.expr = []
+    return True
+
+@meta.hook(KoocParser)
+def create_call_func_addExpr(self, ast, Expr):
+    ast.expr.append(self.value(Expr))
+    return True
+
+@meta.hook(KoocParser)
+def create_call_func_push(self, ast) :
+    ast.set(KoocCall(ast.module, ast.func, ast.typeExpr, True, ast.expr))
     return True
 
 

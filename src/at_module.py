@@ -45,7 +45,7 @@ class AtModule(Node):
         self.fields = fields
         self.locinfo = locinfo
 
-    def convert_node(self, node):
+    def convert_node(self, node, module_name):
         storage = node._ctype._storage
         if storage == Storages.TYPEDEF:
             raise KoocException(self.locinfo, "An error occured")
@@ -59,7 +59,7 @@ class AtModule(Node):
             node._ctype._storage = Storages.STATIC
         elif type(node._ctype) is not FuncType:
             node._ctype._storage = Storages.EXTERN
-        node._name = mangling(node, node._name)
+        node._name = mangling(node, module_name)
 
     def get_c_ast(self, module_list: ObjectList):
 
@@ -70,7 +70,7 @@ class AtModule(Node):
         c_fields = copy.deepcopy(self.fields)
         field_names = []
         for field in c_fields:
-            self.convert_node(field)
+            self.convert_node(field, self.name)
             if field._name in field_names:
                 raise KoocException(self.locinfo, "Variable/function duplicate")
             field_names.append(field._name)
