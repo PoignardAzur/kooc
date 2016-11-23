@@ -16,7 +16,7 @@ kooc_parser = KoocParser(ih)
 class TestKoocCall(unittest.TestCase) :
 
     liste = ObjectList()
-    pa = kooc_parser.parse("""@module A{int d; long v; int f(); int f(int);}""")
+    pa = kooc_parser.parse("""@module A{int d; long v; int f(); int f(long);}""")
     for module in pa.body :
         liste.add_module(module)
 
@@ -41,15 +41,12 @@ class TestKoocCall(unittest.TestCase) :
         parsed_module = kooc_parser.parse("[A f];", "kooc_call")
         control_module = kooc_call.KoocCall("A", "f", "", True, [])
         self.compare_call(parsed_module, control_module, "test_parsing1")
-        #self.assertEqual(parsed_module.get_c_ast(self.liste).to_c(), control_module.get_c_ast(self.liste).to_c())
 
     def test_test(self):
         parsed_module = kooc_parser.parse("[A f : 4];", "kooc_call")
         control_module = kooc_call.KoocCall("A", "f", "", True, ['4'])
         self.compare_call(parsed_module, control_module, "test_parsing2")
-        #self.assertEqual(parsed_module.get_c_ast(self.liste).to_c(), control_module.get_c_ast(self.liste).to_c())
 
         parsed_module = kooc_parser.parse("[A f : [A.v]];", "kooc_call")
         control_module = kooc_call.KoocCall("A", "f", "", True, [kooc_parser.parse("[A.v];", "kooc_call")])
         self.compare_call(parsed_module, control_module, "test_parsing3")
-        #self.assertEqual(parsed_module.get_c_ast(self.liste).to_c(), control_module.get_c_ast(self.liste).to_c())

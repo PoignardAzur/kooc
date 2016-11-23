@@ -2,6 +2,7 @@ from cnorm.nodes import *
 from pyrser.parsing.node import Node
 
 from .mangling import mangling
+from .mangling import mangl_tab
 from .object_list import ObjectList
 
 class KoocCallErrorNotExistingModule(Exception):
@@ -23,33 +24,44 @@ class KoocCall(Node):
         self.args = args
         self.typeExpr = typee
 
+    
     def get_c_ast(self, module_list: ObjectList) :
         decl = int(0)
         found_module = 0
         found_var = 0
-        found_type = 0
         for tmp in module_list.list :
             if tmp.name == self.module_name :
                 found_module = 1
                 for tmp_var in tmp.fields :
-                    mangled = mangling(tmp_var, self.module_name)
-                    if tmp_var._name.find(self.name) != -1 and mangled.find(self.typeExpr) != -1:
-                        found_var = 1
-                        if self.isFunc == False and mangled.find("_var") != -1:
-                            found_type = 1
-                            decl = tmp_var
-                            break
-                        elif self.isFunc == True and mangled.find("_func") != -1:
-                            decl = tmp_var
-                            found_type = 1
-                            break
-
+                    if tmp_var._name == self.name:
+                        if self.isFunc == False and type(tmp_var._ctype) is PrimaryType:
+                            if self.typeExpr != "" :
+                                if mangl_tab[tmp_var._ctype._identifier][tmp_var._ctype._specifier] == self.typeExpr :
+                                    decl = tmp_var
+                                    found_var = 1
+                                    break
+                            else :
+                                decl = tmp_var
+                                found_var = 1
+                                break
+                        elif self.isFunc == True and type(tmp_var._ctype) is FuncType :
+                            if self.typeExpr != "" :
+                                if mangl_tab[tmp_var._ctype._identifier][tmp_var._ctype._specifier] == self.typeExpr :
+                                    decl = tmp_var
+                                    found_var = 1
+                                    break
+                            else :
+                                decl = tmp_var
+                                found_var = 1
+                                break
+                    if found_var == 1:
+                        break
+            if found_module == 1:
+                break
         if found_module == 0:
             raise KoocCallErrorNotExistingModule
         if found_var == 0:
             raise KoocCallErrorNotExistingField
-        if found_type == 0:
-            raise KoocCallErrorNotExistingType
                             
         if type(decl._ctype) is FuncType :
             for arg in self.args:
