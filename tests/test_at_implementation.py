@@ -16,7 +16,7 @@ ih = ImportHandler(silent = True)
 par = cnorm.parsing.declaration.Declaration()
 kooc_parser = kooc_parser.KoocParser(ih)
 
-module = AtModule("foo", par.parse("int x;int a(void);").body, error.LocationInfo.from_stream(kooc_parser._stream))
+module = AtModule("foo", par.parse("int x;").body, error.LocationInfo.from_stream(kooc_parser._stream))
 obj_list = ObjectList()
 obj_list.add_module(module)
 
@@ -41,4 +41,4 @@ class TestAtImplement(unittest.TestCase):
         parsed_module = par.parse("int x;").body[0]
         parsed_module._name = mangling(parsed_module, "foo")
 
-        self.assertEqual(imp.get_c_ast(obj_list), [parsed_module])
+        self.assertRaises(KoocException, imp.get_c_ast, obj_list)

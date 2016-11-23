@@ -54,15 +54,26 @@ class AtImplementation(Node):
             raise KoocException(self.locinfo, "No corresponding module")
         for field in self.fields:
             if type(field._ctype) is not FuncType:
-                print ("Variable declared in @implementation")
                 raise KoocException(self.locinfo, "Variable declared in @implementation")
-#            else:
- #               if 
+            else:
+                found = 0
+                for module_field in module.fields:
+                    if (mangling(field, field._name) == mangling(module_field, module_field._name)):
+                        found += 1
+                if found is not 1 :
+                    raise KoocException(self.locinfo, "Module error")
         c_fields = copy.deepcopy(self.fields)
         field_names = []
         for field in module.fields:
             if type(field._ctype) is not FuncType:
                 c_fields.append(field)
+            else:
+                found = 0
+                for implementation_field in c_fields:
+                    if (mangling(field, field._name) == mangling(implementation_field, implementation_field._name)):
+                        found += 1
+                if found is not 1 :
+                    raise KoocException(self.locinfo, "Implementation error")
         for field in c_fields:
             self.convert_node(field, self.name)
             field_names.append(field._name)
